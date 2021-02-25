@@ -1,5 +1,3 @@
-dir <- '/Users/johnn/Documents/Research/Project3/hierarchical/Rcpp_version/'
-setwd(dir)
 library(Rcpp)
 library(matrixcalc)
 library(mvnfast)

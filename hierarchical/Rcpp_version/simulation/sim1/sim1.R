@@ -1,4 +1,5 @@
 dir1 <- '/soe/wjzhao/project/Project3/hierarchical/Rcpp_version/'
+setwd(dir1)
 plot_dir <- "/soe/wjzhao/project/Project3/hierarchical/plots/Rcpp/"
 source(paste0(dir1, 'hier_PARCOR_cpp.R'))
 source(paste0(dir1, "draw_density_RcppVer.R"))
