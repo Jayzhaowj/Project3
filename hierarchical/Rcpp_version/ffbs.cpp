@@ -7,7 +7,7 @@
 using namespace Rcpp;
 
 // This is a simple example of exporting a C++ function to R. You can
-// source this function into an R session using the Rcpp::sourceCpp 
+// source this function into an R session using the Rcpp::sourceCpp
 // function (or via the Source button on the editor toolbar). Learn
 // more about Rcpp at:
 //
@@ -18,9 +18,9 @@ using namespace Rcpp;
 
 // [[Rcpp::depends(RcppArmadillo, RcppDist)]]
 // [[Rcpp::export]]
-Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat F2, 
-                                          int n_t, int I, int m, int type, int P, 
-                                          double delta1, double delta2, int sample_size, 
+Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat F2,
+                                          int n_t, int I, int m, int type, int P,
+                                          double delta1, double delta2, int sample_size,
                                           bool uncertainty){
   // some constants
   int sign = 1;
@@ -35,19 +35,19 @@ Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat 
   arma::vec nt(n_t, arma::fill::zeros);
   arma::vec dt(n_t, arma::fill::zeros);
   arma::vec St(n_t, arma::fill::zeros);
-  
+
   // parcor states
   arma::mat at(I, n_t, arma::fill::zeros);
   arma::mat mt(I, n_t, arma::fill::zeros);
   arma::mat ft(I, n_t, arma::fill::zeros);
   arma::mat et(I, n_t, arma::fill::zeros);
-  
+
   arma::cube Rt(I, I, n_t, arma::fill::zeros);
   arma::cube Ct(I, I, n_t, arma::fill::zeros);
   arma::cube Ut(I, I, n_t, arma::fill::zeros);
   arma::cube Qt(I, I, n_t, arma::fill::zeros);
   arma::cube inv_Qt(I, I, n_t, arma::fill::zeros);
-  
+
   //structure level
   arma::mat akt(I, n_t, arma::fill::zeros);
   arma::mat mkt(I, n_t, arma::fill::zeros);
@@ -56,7 +56,7 @@ Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat 
   arma::cube V2t(I, I, n_t, arma::fill::zeros);
   arma::cube Ukt(I, I, n_t, arma::fill::zeros);
   arma::cube F1t(I, I, n_t, arma::fill::zeros);
-  
+
   // smooth part
   arma::mat mnt(I, n_t, arma::fill::zeros);
   arma::cube Cnt(I, I, n_t, arma::fill::zeros);
@@ -65,13 +65,13 @@ Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat 
   arma::cube Ant(I, I, n_t, arma::fill::zeros);
   arma::cube Ankt(I, I, n_t, arma::fill::zeros);
   arma::mat resid(I, n_t, arma::fill::zeros);
-  
+
   // sampling
   arma::cube mnt_sample(sample_size, I, n_t);
   arma::cube mnkt_sample(sample_size, I, n_t);
 
-  
-  
+
+
   // asign the lower bound and upper bound
   int ubound = 0;
   int lbound = 0;
@@ -84,14 +84,14 @@ Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat 
     lbound = 0;
     sign = -1;
   }
-  
-  
+
+
   // filtering conditional on V:
   for(int i = lbound; i < ubound; i++){
-    
+
     // prior distribution update
-    
-    F1t.slice(i) = arma::diagmat(F1.col(i - sign*m)); 
+
+    F1t.slice(i) = arma::diagmat(F1.col(i - sign*m));
     if(i == lbound){
       akt.col(i) = mk_0;
       Rkt.slice(i) = Ck_0/delta1;
@@ -101,11 +101,11 @@ Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat 
       Rkt.slice(i) = Ckt.slice(i-1)/delta1;
       Rkt.slice(i) = 0.5*Rkt.slice(i) + 0.5*arma::trans(Rkt.slice(i));
     }
-    
+
     at.col(i) = F2*akt.col(i);
     Rt.slice(i) = F2*Rkt.slice(i)*arma::trans(F2)/delta2;
     V2t.slice(i) = (1 - delta2)/delta2 * F2 * Rkt.slice(i) * arma::trans(F2);
-    
+
     // predictive distribution update
     ft.col(i) = F1t.slice(i) * at.col(i);
     et.col(i) = yt.col(i) - ft.col(i);
@@ -116,7 +116,7 @@ Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat 
       Qt.slice(i) = F1t.slice(i) * Rt.slice(i) * arma::trans(F1t.slice(i)) + St(i-1)*I_n;
       Qt.slice(i) = 0.5 * Qt.slice(i) + 0.5 * arma::trans(Qt.slice(i));
     }
-    
+
     // posterior distribution
     // evolution equation
     Ukt.slice(i) = Rkt.slice(i) * arma::trans(F1t.slice(i)*F2);
@@ -137,8 +137,8 @@ Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat 
     }else{
       Ckt.slice(i) = (St(i)/St(i-1))*(Rkt.slice(i) - Ukt.slice(i)*inv_Qt.slice(i)*arma::trans(Ukt.slice(i)));
     }
-    
-    
+
+
     // Structural equation
     Ut.slice(i) = Rt.slice(i) * arma::trans(F1t.slice(i));
     mt.col(i) = at.col(i) + Ut.slice(i) * inv_Qt.slice(i) * et.col(i);
@@ -147,12 +147,12 @@ Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat 
     }else{
       Ct.slice(i) = (St(i)/St(i-1))*(Rt.slice(i) - Ut.slice(i) * inv_Qt.slice(i) * arma::trans(Ut.slice(i)));
     }
-    
+
     if((i >= P) & (i < n_t - P)){
       arma::vec tmp_ll = dmvnorm(arma::trans(yt.col(i)), ft.col(i), Qt.slice(i), true);
       ll += arma::sum(tmp_ll);
     }
-    
+
   }
 
 
@@ -162,33 +162,32 @@ Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat 
   mnkt.col(ubound-1) = mkt.col(ubound-1);
   Cnkt.slice(ubound-1) = Ckt.slice(ubound-1);
   for(int i = (ubound - 2); i > lbound - 1; i--){
-    //F1t.slice(i) = arma::diagmat(F1.col(i - sign*m)); 
     arma::mat V02t_s = St(ubound-1) * I_n + F1t.slice(i)*V2t.slice(i)*arma::trans(F1t.slice(i));
     arma::mat inv_V02t_s = arma::inv_sympd(0.5*V02t_s + 0.5*arma::trans(V02t_s));
-    
+
     Ant.slice(i) = F2*Ckt.slice(i)*arma::trans((I_n - V2t.slice(i)*arma::trans(F1t.slice(i))*inv_V02t_s*F1t.slice(i))*F2);
     Ankt.slice(i) = Ckt.slice(i);
-    
+
     arma::mat inv_Rtp1 = arma::inv_sympd(0.5*Rt.slice(i+1) + 0.5*arma::trans(Rt.slice(i+1)));
     arma::mat inv_Rktp1 = arma::inv_sympd(0.5*Rkt.slice(i+1) + 0.5*arma::trans(Rkt.slice(i+1)));
-    
+
     mnt.col(i) = mt.col(i) + arma::trans(Ant.slice(i))*inv_Rtp1*(mnt.col(i+1) - at.col(i+1));
     Cnt.slice(i) = (Ct.slice(i) - arma::trans(Ant.slice(i))*inv_Rtp1*(Rt.slice(i+1) - Cnt.slice(i+1))*inv_Rtp1*Ant.slice(i));
     Cnt.slice(i) = 0.5*Cnt.slice(i) + 0.5*arma::trans(Cnt.slice(i));
-    
+
     mnkt.col(i) = mkt.col(i) + arma::trans(Ankt.slice(i))*inv_Rktp1*(mnkt.col(i+1) - akt.col(i+1));
     Cnkt.slice(i) = (Ckt.slice(i) - arma::trans(Ankt.slice(i))*inv_Rktp1*(Rkt.slice(i+1) - Cnkt.slice(i+1))*inv_Rktp1*Ankt.slice(i+1));
     Cnkt.slice(i) = 0.5*Cnkt.slice(i) + 0.5*arma::trans(Cnkt.slice(i));
-    
+
   }
-  
+
   // compute the residuals
   resid.col(ubound-1) = yt.col(ubound-1) - F1t.slice(ubound-1) * mnt.col(ubound-1);
   for(int i = (ubound - 2); i > lbound - 1; i--){
     resid.col(i) = yt.col(i) - F1t.slice(i) * mnt.col(i);
   }
-  
-  
+
+
   // do the sampling
   if(uncertainty){
     for(int i = (ubound-2); i > lbound - 1; i--){
@@ -196,19 +195,15 @@ Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat 
       mnkt_sample.slice(i) = rmvt(sample_size, mnkt.col(i), St(ubound-1)/St(i)*Cnkt.slice(i), nt(ubound-1));
     }
   }
-  return Rcpp::List::create(Rcpp::Named("mnt") = mnt, 
+  return Rcpp::List::create(Rcpp::Named("mnt") = mnt,
                             Rcpp::Named("mnkt") = mnkt,
-                            //Rcpp::Named("Cnt") = Cnt,
-                            //Rcpp::Named("Cnkt") = Cnkt,
                             Rcpp::Named("mnt_sample") = mnt_sample,
                             Rcpp::Named("mnkt_sample") = mnkt_sample,
                             Rcpp::Named("akt") = akt,
                             Rcpp::Named("Rkt") = Rkt,
-                            //Rcpp::Named("at") = at,
                             Rcpp::Named("Rt") = Rt,
                             Rcpp::Named("residuals") = resid,
-                            Rcpp::Named("sigma2t") = St, 
-                            //Rcpp::Named("ft") = ft,
+                            Rcpp::Named("sigma2t") = St,
                             Rcpp::Named("Qt") = Qt,
                             Rcpp::Named("nt") = nt,
                             Rcpp::Named("ll") = ll);
@@ -217,30 +212,27 @@ Rcpp::List forward_filter_backward_smooth(arma::mat yt, arma::mat F1, arma::mat 
 
 // [[Rcpp::depends(RcppArmadillo, RcppDist)]]
 // [[Rcpp::export]]
-Rcpp::List ffbs_DIC(arma::mat yt, arma::mat F1, arma::mat F2, 
+Rcpp::List ffbs_DIC(arma::mat yt, arma::mat F1, arma::mat F2,
                     int n_t, int I, int m, int type, int P,
-                    arma::mat delta, bool DIC, int sample_size, 
+                    arma::mat delta, bool DIC, int sample_size,
                     int chains, bool uncertainty){
   // do ffbs
   int delta_n = delta.n_rows;
   double ll_DIC = 0.0;
 
-  //double es_DIC = 0.0;
-  //arma::rowvec ll(delta_n);
-  Rcpp::List result_opt = forward_filter_backward_smooth(yt, F1, F2, 
+  Rcpp::List result_opt = forward_filter_backward_smooth(yt, F1, F2,
                                                          n_t, I, m,  type, P,
-                                                         delta(0, 0), delta(0, 1), 
+                                                         delta(0, 0), delta(0, 1),
                                                          sample_size, uncertainty);
   double ll_max = result_opt["ll"];
   arma::rowvec delta_min = delta.row(0);
-  //ll(0) = ll_max;
+
   for(int i = 1; i < delta_n; i++){
-    Rcpp::List result_new = forward_filter_backward_smooth(yt, F1, F2, 
+    Rcpp::List result_new = forward_filter_backward_smooth(yt, F1, F2,
                                                            n_t, I, m,  type, P,
-                                                           delta(i, 0), delta(i, 1), 
+                                                           delta(i, 0), delta(i, 1),
                                                            sample_size, uncertainty);
     double ll_new = result_new["ll"];
-    //ll(i) = ll_new;
     if(ll_max < ll_new){
       result_opt = result_new;
       ll_max = ll_new;
@@ -248,26 +240,22 @@ Rcpp::List ffbs_DIC(arma::mat yt, arma::mat F1, arma::mat F2,
     }
   }
   ll_DIC = ll_max;
-  
+
   if(DIC){
-    double pDIC = compute_pDIC(result_opt, yt, F1, F2, sample_size, 
+    double pDIC = compute_pDIC(result_opt, yt, F1, F2, sample_size,
                                    m, P, type, chains, ll_DIC);
-    return Rcpp::List::create(Rcpp::Named("mnt") = result_opt["mnt"], 
+    return Rcpp::List::create(Rcpp::Named("mnt") = result_opt["mnt"],
                               Rcpp::Named("mnkt") = result_opt["mnkt"],
-                              //Rcpp::Named("Cnt") = result_opt["Cnt"],
-                              //Rcpp::Named("Cnkt") = result_opt["Cnkt"],
                               Rcpp::Named("mnt_sample") = result_opt["mnt_sample"],
                               Rcpp::Named("mnkt_sample") = result_opt["mnkt_sample"],
                               Rcpp::Named("residuals") = result_opt["residuals"],
-                              Rcpp::Named("sigma2t") = result_opt["sigma2t"], 
+                              Rcpp::Named("sigma2t") = result_opt["sigma2t"],
                               Rcpp::Named("delta") = delta_min,
                               Rcpp::Named("ll") = ll_DIC,
                               Rcpp::Named("pDIC") = pDIC);
   }else{
-    return Rcpp::List::create(Rcpp::Named("mnt") = result_opt["mnt"], 
+    return Rcpp::List::create(Rcpp::Named("mnt") = result_opt["mnt"],
                               Rcpp::Named("mnkt") = result_opt["mnkt"],
-                              //Rcpp::Named("Cnt") = result_opt["Cnt"],
-                              //Rcpp::Named("Cnkt") = result_opt["Cnkt"],
                               Rcpp::Named("mnt_sample") = result_opt["mnt_sample"],
                               Rcpp::Named("mnkt_sample") = result_opt["mnkt_sample"],
                               Rcpp::Named("residuals") = result_opt["residuals"],
@@ -275,6 +263,4 @@ Rcpp::List ffbs_DIC(arma::mat yt, arma::mat F1, arma::mat F2,
                               Rcpp::Named("delta") = delta_min,
                               Rcpp::Named("ll") = ll_DIC);
   }
-  
-  
 }

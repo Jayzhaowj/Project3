@@ -1,5 +1,6 @@
-dir1 <- '/Users/johnn/Documents/Research/Project3/hierarchical/Rcpp_version/'
-plot_dir <- "/Users/johnn/Documents/Research/Project3/hierarchical/eeg/plots/"
+dir1 <- '/soe/wjzhao/project/Project3/hierarchical/Rcpp_version/'
+plot_dir <- "/soe/wjzhao/project/Project3/hierarchical/eeg/plots/"
+setwd(dir1)
 source(paste0(dir1, 'hier_PARCOR_cpp.R'))
 source(paste0(dir1, "draw_density_RcppVer.R"))
 
@@ -52,6 +53,8 @@ dlmd17_data <- dlmd17_data - mean(dlmd17_data)
 data_all <- t(rbind(dlmd7_data, dlmd8_data, dlmd9_data,
                   dlmd11_data, dlmd12_data, dlmd13_data,
                   dlmd15_data, dlmd16_data, dlmd17_data))
+
+sample_size <- 1000
 n_t <- 3600
 n_I <- 9
 P <- 15
@@ -60,8 +63,8 @@ F2t <- as.matrix(model.matrix(~a, F2t_m, contrasts = list(a = "contr.sum")))
 delta <- seq(0.995, 0.999, by = 0.001)
 delta_matrix <- as.matrix(expand.grid(delta, delta))
 result_parcor <- hparcor(yt = data_all, P = P, F2 = F2t,
-                         delta = delta_matrix, sample_size = 500, 
-                         chains = 2, DIC = TRUE)
+                         delta = delta_matrix, sample_size = sample_size, 
+                         chains = 1, DIC = TRUE, uncertainty = TRUE)
 
 ##########################################
 ##### optimal model order
@@ -85,6 +88,20 @@ coef_parcor_mean <- PAR_to_AR_fun(phi_fwd = result_parcor$mu_fwd,
 
 coef_mean <- coef_parcor_mean[[P_opt]]$forward
 
+##############################################
+##### 95% credible interval 
+##############################################
+coef_sample <- lapply(1:sample_size, function(x) compute_TVAR(phi_fwd = result_parcor$phi_fwd_sample[x, , ,],
+                                                              phi_bwd = result_parcor$phi_bwd_sample[x, , ,],
+                                                              P_opt = P_opt))
+coef_sample <- simplify2array(coef_sample)
+coef_mean_sample <- lapply(1:sample_size, function(x) compute_TVAR(phi_fwd = result_parcor$mu_fwd_sample[x, , ,],
+                                                                   phi_bwd = result_parcor$mu_bwd_sample[x, , ,],
+                                                                   P_opt = P_opt))
+coef_mean_sample <- simplify2array(coef_mean_sample)
+
+
+coef_quantile <- apply(coef_sample, 1:3, quantile, c(0.025, 0.5, 0.975))
 
 
 

@@ -1,6 +1,6 @@
 //
 //  pDIC.hpp
-//  
+//
 //
 //  Created by Wenjie Zhao on 10/24/19.
 //
@@ -18,7 +18,7 @@
 // [[Rcpp::depends(RcppArmadillo, RcppDist)]]
 // [[Rcpp::export]]
 
-double compute_pDIC(Rcpp::List temp_filter, arma::mat yt, arma::mat F1, 
+double compute_pDIC(Rcpp::List temp_filter, arma::mat yt, arma::mat F1,
                     arma::mat F2, int sample_size, int m, int P, int type,
                     int chains, double ll){
     //double ll = 0.0;
@@ -38,7 +38,7 @@ double compute_pDIC(Rcpp::List temp_filter, arma::mat yt, arma::mat F1,
     }else{
         sign = -1;
     }
-    
+
     int n_I = akt.n_rows;
     int n_t = akt.n_cols;
     arma::cube F1t(n_I, n_I, n_t, arma::fill::zeros);
@@ -50,20 +50,20 @@ double compute_pDIC(Rcpp::List temp_filter, arma::mat yt, arma::mat F1,
         F1t.slice(j) = arma::diagmat(F1.col(j - sign*m));
         //arma::vec tmp_ll = dmvnorm(arma::trans(yt.col(j)), ft.col(j), Qt.slice(j), true);
         //ll += arma::sum(tmp_ll);
-        
+
         //arma::mat sample_akt = rmvnorm(sample_size, akt.col(j), Rkt.slice(j));
         //arma::mat sample_at = F2*arma::trans(sample_akt);
         //arma::mat sample_ft = F1t.slice(j) * sample_at;
-        arma::mat ll_sim(sample_size, chains, arma::fill::zeros);
+        arma::mat ll_sim(sample_size/chains, chains, arma::fill::zeros);
        #pragma omp parallel for num_threads(chains)
             for (int chain = 0; chain < chains; ++chain) {
-                for(int k = 0; k < sample_size; k++){
-                    //arma::sample_Qt = F1t.slice(j) * 
+                for(int k = 0; k < sample_size/chains; k++){
+                    //arma::sample_Qt = F1t.slice(j) *
                     arma::mat sample_akt = rmvnorm(1, akt.col(j), Rkt.slice(j));
                     arma::mat sample_at = rmvnorm(1, F2*arma::trans(sample_akt), Rt.slice(j));
                     arma::mat sample_ft = F1t.slice(j)*arma::trans(sample_at);
                     //arma::mat sample_ft = F1t.slice(j)*at.col(j);
-                    arma::vec tmp_ll_sim = dmvnorm(arma::trans(yt.col(j)), 
+                    arma::vec tmp_ll_sim = dmvnorm(arma::trans(yt.col(j)),
                                                    sample_ft, Qt.slice(j), true);
                     ll_sim(k, chain) = arma::sum(tmp_ll_sim);
             }

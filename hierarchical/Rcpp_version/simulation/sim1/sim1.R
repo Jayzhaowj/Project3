@@ -1,8 +1,12 @@
-dir1 <- '/soe/wjzhao/project/Project3/hierarchical/Rcpp_version/'
-setwd(dir1)
+# dir1 <- '/soe/wjzhao/project/Project3/hierarchical/Rcpp_version/'
+# setwd(dir1)
 plot_dir <- "/soe/wjzhao/project/Project3/hierarchical/plots/Rcpp/"
-source(paste0(dir1, 'hier_PARCOR_cpp.R'))
-source(paste0(dir1, "draw_density_RcppVer.R"))
+# source(paste0(dir1, 'hier_PARCOR_cpp.R'))
+# source(paste0(dir1, "draw_density_RcppVer.R"))
+
+
+library(matrixcalc)
+library(PARCOR)
 
 ########################################
 ##### simulation 4
@@ -12,7 +16,7 @@ source(paste0(dir1, "draw_density_RcppVer.R"))
 ##################
 draw_ts <- function(yt, ind, ...){
   par(cex = 1.5)
-  plot(yt, type = 'l', xlab = 'time', ylab = 'value', 
+  plot(yt, type = 'l', xlab = 'time', ylab = 'value',
        main = bquote("ts"[.(ind)]), ...)
 }
 
@@ -32,7 +36,7 @@ gen.sim <- function(n_t, n_I, P=2, vt=0.1, et){
   yt_tmp <- rbind(y_init, yt)
   ## generate the common part lambda_mu
   lambdat_mu <- 15*(1:n_t)/n_t + 5
-  
+
   ## generate the ar coefficients phit
   for(ts in 1:n_I){
     for(i in 1:n_t){
@@ -43,12 +47,12 @@ gen.sim <- function(n_t, n_I, P=2, vt=0.1, et){
       }
     }
   }
-  
+
   for(ts in 1:n_I){
     phit[ts, , 1] <- rt*cos(2*pi/lambdat[ts, ])
-    
+
   }
-  
+
   ## genrate the data sets
   for(ts in 1:n_I){
     for(i in 1:n_t+P){
@@ -62,7 +66,7 @@ gen.sim <- function(n_t, n_I, P=2, vt=0.1, et){
 }
 
 ########################
-#### generate simulation data 
+#### generate simulation data
 ########################
 
 set.seed(1234)
@@ -78,7 +82,7 @@ true_ar <- sim$phit
 true_ar_mean <- (0.1*(1:n_t)/n_t + 0.85)*cos(2*pi/sim$lambdat_mu)
 
 #################################
-#### draw time series and 
+#### draw time series and
 #################################
 ###
 layout(matrix(1:(n_I+1), nrow = 2, ncol = 3, byrow = TRUE))
@@ -96,22 +100,24 @@ F2t[5,1] <- 1
 
 delta <- seq(0.99, 0.999, 0.002)
 delta_matrix <- as.matrix(expand.grid(delta, delta))
-# delta_matrix <- cbind(replicate(2, delta_matrix_tmp[, 1]), 
+# delta_matrix <- cbind(replicate(2, delta_matrix_tmp[, 1]),
 #                       delta_matrix_tmp)
-# result_parcor <- hier_parcor(yt = yt, delta = delta_matrix, 
+# result_parcor <- hier_parcor(yt = yt, delta = delta_matrix,
 #                              P = 5,
 #                              F2 = F2t)
 
 sample_size <- 1000
-result_parcor <- hparcor(yt = yt, delta = delta_matrix, 
-                         P = 5, F2 = F2t, sample_size = sample_size, 
-                         chains = 1, DIC = TRUE, uncertainty = TRUE)
+result_parcor <- hparcor(yt = yt, delta = delta_matrix,
+                         P = 5, F2 = F2t, sample_size = sample_size,
+                         chains = 10, DIC = TRUE, uncertainty = TRUE)
 
 ###########################
 ##### Optimal model order
 ###########################
 P_opt <- which.min(result_parcor$DIC_fwd)
 cat("Optimal model order: ", P_opt)
+print(result_parcor$DIC_fwd)
+print(result_parcor$best_pred_dens_fwd)
 ###########################
 ##### selected discount factor
 ###########################
@@ -124,27 +130,27 @@ print(result_parcor$best_delta_fwd)
 sigma2 <- rep(result_parcor$sigma2t_fwd[n_t-P, P_opt], n_t)
 
 ## compute ar coefficients
-coef_parcor <- PAR_to_AR_fun(phi_fwd = result_parcor$phi_fwd, 
-                             phi_bwd = result_parcor$phi_bwd)
+coef_parcor <- run_dl(phi_fwd = result_parcor$phi_fwd,
+                      phi_bwd = result_parcor$phi_bwd)
 
 
 coef <- coef_parcor[[P_opt]]$forward
 
 ## compute ar coefficients
-coef_parcor_mean <- PAR_to_AR_fun(phi_fwd = result_parcor$mu_fwd, 
-                                  phi_bwd = result_parcor$mu_bwd)
+coef_parcor_mean <- run_dl(phi_fwd = result_parcor$mu_fwd,
+                           phi_bwd = result_parcor$mu_bwd)
 
 coef_mean <- coef_parcor_mean[[P_opt]]$forward
 
 
 ##
-coef_sample <- lapply(1:sample_size, function(x) compute_TVAR(phi_fwd = result_parcor$phi_fwd_sample[x, , ,],
-                                                              phi_bwd = result_parcor$phi_bwd_sample[x, , ,],
-                                                              P_opt = P_opt))
-coef_sample <- simplify2array(coef_sample)
-coef_mean_sample <- lapply(1:sample_size, function(x) compute_TVAR(phi_fwd = result_parcor$mu_fwd_sample[x, , ,],
-                                                                   phi_bwd = result_parcor$mu_bwd_sample[x, , ,],
+coef_sample <- lapply(1:sample_size, function(x) compute_TVAR_hier(phi_fwd = result_parcor$phi_fwd_sample[x, , ,],
+                                                                   phi_bwd = result_parcor$phi_bwd_sample[x, , ,],
                                                                    P_opt = P_opt))
+coef_sample <- simplify2array(coef_sample)
+coef_mean_sample <- lapply(1:sample_size, function(x) compute_TVAR_hier(phi_fwd = result_parcor$mu_fwd_sample[x, , ,],
+                                                                        phi_bwd = result_parcor$mu_bwd_sample[x, , ,],
+                                                                        P_opt = P_opt))
 coef_mean_sample <- simplify2array(coef_mean_sample)
 
 
@@ -156,36 +162,31 @@ coef_quantile <- apply(coef_sample, 1:3, quantile, c(0.025, 0.5, 0.975))
 w <- seq(0.001, 0.499, by = 0.001)
 
 ### spectral density of each time series
-s <- compute_sd(w = w, 
-                phi = coef, 
+s <- cp_sd_uni(w = w,
+                phi = coef,
                 sigma2 = sigma2)
 
 ### average of spectral density
-s_mean <- compute_sd(w=w,
-                     phi= coef_mean, 
-                     sigma2 = sigma2)
+s_mean <- cp_sd_uni(w=w,
+                    phi= coef_mean,
+                    sigma2 = sigma2)
 
 ### True spectral density
-s_true <- compute_sd(true_ar, rep(et, n_t), w)
-
-
-s_quantile1 <- compute_sd(w=w,
-                          phi=coef_quantile[1, , , ], 
-                          sigma2=sigma2)
-
-s_quantile2<- compute_sd(w=w,
-                         phi=coef_quantile[3, , , ], 
-                         sigma2=sigma2)
+s_true <- cp_sd_uni(phi=true_ar, sigma2 = rep(et, n_t), w=w)
 
 
 
 library(snowfall)
-sfInit(parallel = TRUE, cpus=5, type="SOCK")
-sfExport("compute_sd", "w", "coef_sample", "sigma2", "cal.tfr")
-s_sample <- sfLapply(1:(sample_size/2), function(x) compute_sd(w=w,
-                                                               phi = coef_sample[, , , x],
-                                                               sigma2 = sigma2))
+sfInit(parallel = TRUE, cpus=20, type="SOCK")
+sfLibrary(PARCOR)
+sfExport("w", "coef_sample", "sigma2")
+s_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
+                                                            phi = coef_sample[, , , x],
+                                                            sigma2 = sigma2))
 sfStop()
+
+s_sample <- simplify2array(s_sample)
+s_quantle <- apply(s_sample, 1:3, quantile, c(0.025, 0.975))
 
 dev.new()
 
@@ -201,29 +202,29 @@ for(i in 1:n_I){
   for(j in 1:P_opt){
     plot(coef[i, (P+1):(n_t-P), j], xlab = "time", ylab = "value",
          type = 'l', main = bquote(phi[.(i)*.(j)]),
-         ylim = range(coef[i, (P+1):(n_t-P), j], 
-                      coef_mean[1, (P+1):(n_t-P), j], 
-                      true_ar[i, (P+1):(n_t-P), j], 
+         ylim = range(coef[i, (P+1):(n_t-P), j],
+                      coef_mean[1, (P+1):(n_t-P), j],
+                      true_ar[i, (P+1):(n_t-P), j],
                       coef_quantile[, i, (P+1):(n_t-P), j],
                       na.rm = TRUE))
-    
-    polygon(c(index, 
-              rev(index)), 
-            c(coef_quantile[3, i, (P+1):(n_t-P), j], 
-              rev(coef_quantile[1, i, (P+1):(n_t-P), j])), 
+
+    polygon(c(index,
+              rev(index)),
+            c(coef_quantile[3, i, (P+1):(n_t-P), j],
+              rev(coef_quantile[1, i, (P+1):(n_t-P), j])),
             col="skyblue", border = NA)
     lines(coef[i, (P+1):(n_t-P), j], col = 'black', lty = 1)
     lines(true_ar[i, (P+1):(n_t-P), j], type = 'l', col = 'red', lty = 3)
-    lines(coef_mean[1, (P+1):(n_t-P), j], type = 'l', 
+    lines(coef_mean[1, (P+1):(n_t-P), j], type = 'l',
           col = 'blue', lty = 2)
-    
+
     if(j == 1 | i==1 | i==3){
       loc <- "bottomright"
     }else{
       loc <- "topright"
     }
-    legend(loc, legend=c("true", "estimated", "mean"), 
-           lty = c(3,1,2), col = c("red", "black", "blue"), 
+    legend(loc, legend=c("true", "estimated", "mean"),
+           lty = c(3,1,2), col = c("red", "black", "blue"),
            cex = 3)
   }
 }
@@ -258,47 +259,39 @@ dev.off()
 
 for(i in 1:n_I){
   index <- i
+  s_quantile <- apply(s_sample[i, , , ], 1:2, quantile, c(0.025, 0.975))
+  zlim <- range(s[index, (P+1):(n_t-P),],
+                s_quantile[, (P+1):(n_t-P),],
+                s_true[index, (P+1):(n_t-P), ])
   png(filename = paste0(plot_dir, sim_index, '/scale/est_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  draw.density(w = w, index = index, P = P, 
-               n_t = n_t, s = s, zlim = range(s[[index]][(P+1):(n_t-P),], 
-                                              #s_quantile1[[index]][(P+1):(n_t-P),],
-                                              #s_quantile2[[index]][(P+1):(n_t-P),],
-                                              s_true[[index]][(P+1):(n_t-P), ]))
+  draw_density_hier(w = w, index = index, P = P,
+                    n_t = n_t, s = s, zlim = zlim)
   dev.off()
-  
-  
+
+
   index <- i
   png(filename = paste0(plot_dir, sim_index, '/scale/true_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  draw.density(w = w, index = index, P = P, 
-               n_t = n_t, s = s_true, zlim = range(s[[index]][(P+1):(n_t-P),], 
-                                                   #s_quantile1[[index]][(P+1):(n_t-P),],
-                                                   #s_quantile2[[index]][(P+1):(n_t-P),],
-                                                   s_true[[index]][(P+1):(n_t-P), ]))
+  draw.density(w = w, index = index, P = P,
+               n_t = n_t, s = s_true, zlim = zlim)
   dev.off()
-  
-  
-  # index <- i
-  # png(filename = paste0(plot_dir, sim_index, '/scale/ql_', index, 'st.png'))
-  # par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  # draw.density(w = w, index = index, P = P, 
-  #              n_t = n_t, s = s_quantile1, zlim = range(s[[index]][(P+1):(n_t-P),], 
-  #                                                       s_quantile1[[index]][(P+1):(n_t-P),],
-  #                                                       s_quantile2[[index]][(P+1):(n_t-P),],
-  #                                                       s_true[[index]][(P+1):(n_t-P), ]))
-  # dev.off()
-  # 
-  # 
-  # index <- i
-  # png(filename = paste0(plot_dir, sim_index, '/scale/qu_', index, 'st.png'))
-  # par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  # draw.density(w = w, index = index, P = P, 
-  #              n_t = n_t, s = s_quantile2, zlim = range(s[[index]][(P+1):(n_t-P),], 
-  #                                                       s_quantile1[[index]][(P+1):(n_t-P),],
-  #                                                       s_quantile2[[index]][(P+1):(n_t-P),],
-  #                                                       s_true[[index]][(P+1):(n_t-P), ]))
-  # dev.off()
+
+
+  index <- i
+  png(filename = paste0(plot_dir, sim_index, '/scale/ql_', index, 'st.png'))
+  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  draw.density(w = w, index = index, P = P,
+               n_t = n_t, s = s_quantile1, zlim = zlim)
+  dev.off()
+
+
+  index <- i
+  png(filename = paste0(plot_dir, sim_index, '/scale/qu_', index, 'st.png'))
+  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  draw.density(w = w, index = index, P = P,
+               n_t = n_t, s = s_quantile2, zlim = zlim)
+  dev.off()
 }
 
 
@@ -308,7 +301,7 @@ for(i in 1:n_I){
 index <- 1
 png(filename = paste0(plot_dir, sim_index, '/scale/est_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-draw.density(w = w, index = index, P = P, 
-             n_t = n_t, s = s_mean, zlim = range(s_mean[[index]][(P+1):(n_t-P),]))
+draw.density(w = w, index = index, P = P,
+             n_t = n_t, s = s_mean, zlim = range(s_mean))
 dev.off()
 
