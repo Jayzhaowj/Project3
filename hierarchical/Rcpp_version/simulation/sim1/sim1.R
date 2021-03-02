@@ -186,7 +186,7 @@ s_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
 sfStop()
 
 s_sample <- simplify2array(s_sample)
-s_quantle <- apply(s_sample, 1:3, quantile, c(0.025, 0.975))
+#s_quantile <- apply(s_sample, 1:3, quantile, c(0.025, 0.975))
 
 dev.new()
 
@@ -273,16 +273,16 @@ for(i in 1:n_I){
   index <- i
   png(filename = paste0(plot_dir, sim_index, '/scale/true_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  draw.density(w = w, index = index, P = P,
-               n_t = n_t, s = s_true, zlim = zlim)
+  draw_density_hier(w = w, index = index, P = P,
+                    n_t = n_t, s = s_true, zlim = zlim)
   dev.off()
 
 
   index <- i
   png(filename = paste0(plot_dir, sim_index, '/scale/ql_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  draw.density(w = w, index = index, P = P,
-               n_t = n_t, s = s_quantile1, zlim = zlim)
+  draw_density_hier(w = w, index = index, P = P,
+                    n_t = n_t, s = s_quantile[1, , ], zlim = zlim)
   dev.off()
 
 
@@ -290,7 +290,7 @@ for(i in 1:n_I){
   png(filename = paste0(plot_dir, sim_index, '/scale/qu_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw.density(w = w, index = index, P = P,
-               n_t = n_t, s = s_quantile2, zlim = zlim)
+               n_t = n_t, s = s_quantile[2, , ], zlim = zlim)
   dev.off()
 }
 

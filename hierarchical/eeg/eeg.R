@@ -1,20 +1,20 @@
-dir1 <- '/soe/wjzhao/project/Project3/hierarchical/Rcpp_version/'
+# dir1 <- '/soe/wjzhao/project/Project3/hierarchical/Rcpp_version/'
 plot_dir <- "/soe/wjzhao/project/Project3/hierarchical/eeg/plots/"
-setwd(dir1)
-source(paste0(dir1, 'hier_PARCOR_cpp.R'))
-source(paste0(dir1, "draw_density_RcppVer.R"))
+# setwd(dir1)
+# source(paste0(dir1, 'hier_PARCOR_cpp.R'))
+# source(paste0(dir1, "draw_density_RcppVer.R"))
+library(PARCOR)
 
-
-draw.density <- function(w, index, P, n_t, s, ...){
-  x_coord <- seq(0, 1, length.out = n_t-2*P)
-  y_coord <- w
-  jet.colors <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F", 
-                                   "yellow", "#FF7F00", "red", "#7F0000"))
-  filled.contour(x_coord, y_coord, s[[index]][(P+1):(n_t-P), ], xlab = 'time', 
-                 ylab = 'frequency',
-                 color.palette = jet.colors, ...)
-  cat('Graph has been drawn!\n')
-}
+# draw.density <- function(w, index, P, n_t, s, ...){
+#   x_coord <- seq(0, 1, length.out = n_t-2*P)
+#   y_coord <- w
+#   jet.colors <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F",
+#                                    "yellow", "#FF7F00", "red", "#7F0000"))
+#   filled.contour(x_coord, y_coord, s[[index]][(P+1):(n_t-P), ], xlab = 'time',
+#                  ylab = 'frequency',
+#                  color.palette = jet.colors, ...)
+#   cat('Graph has been drawn!\n')
+# }
 
 
 
@@ -60,10 +60,10 @@ n_I <- 9
 P <- 15
 F2t_m <- data.frame(a = gl(n_I, 1))
 F2t <- as.matrix(model.matrix(~a, F2t_m, contrasts = list(a = "contr.sum")))
-delta <- seq(0.995, 0.999, by = 0.001)
+delta <- seq(0.99, 0.999, by = 0.001)
 delta_matrix <- as.matrix(expand.grid(delta, delta))
 result_parcor <- hparcor(yt = data_all, P = P, F2 = F2t,
-                         delta = delta_matrix, sample_size = sample_size, 
+                         delta = delta_matrix, sample_size = sample_size,
                          chains = 1, DIC = TRUE, uncertainty = TRUE)
 
 ##########################################
@@ -79,17 +79,17 @@ cat("Optimal model order: ", P_opt)
 print(result_parcor$best_delta_fwd)
 
 ## compute ar coefficients
-coef_parcor <- PAR_to_AR_fun(phi_fwd = result_parcor$phi_fwd, 
+coef_parcor <- PAR_to_AR_fun(phi_fwd = result_parcor$phi_fwd,
                              phi_bwd = result_parcor$phi_bwd)
 coef <- coef_parcor[[P_opt]]$forward
 
-coef_parcor_mean <- PAR_to_AR_fun(phi_fwd = result_parcor$mu_fwd, 
+coef_parcor_mean <- PAR_to_AR_fun(phi_fwd = result_parcor$mu_fwd,
                                   phi_bwd = result_parcor$mu_bwd)
 
 coef_mean <- coef_parcor_mean[[P_opt]]$forward
 
 ##############################################
-##### 95% credible interval 
+##### 95% credible interval
 ##############################################
 coef_sample <- lapply(1:sample_size, function(x) compute_TVAR(phi_fwd = result_parcor$phi_fwd_sample[x, , ,],
                                                               phi_bwd = result_parcor$phi_bwd_sample[x, , ,],
@@ -111,13 +111,13 @@ coef_quantile <- apply(coef_sample, 1:3, quantile, c(0.025, 0.5, 0.975))
 w <- seq(0.001, 0.499, by = 0.001)
 
 ### spectral density of each time series
-s <- compute_sd(w = w, 
-                phi = coef, 
+s <- compute_sd(w = w,
+                phi = coef,
                 sigma2 = rep(result_parcor$sigma2t_fwd[n_t-P, P_opt], n_t))
 
 ### average of spectral density
 s_mean <- compute_sd(w=w,
-                     phi= coef_mean, 
+                     phi= coef_mean,
                      sigma2 = rep(result_parcor$sigma2t_fwd[n_t-P, P_opt], n_t))
 
 
@@ -149,11 +149,11 @@ zlim <- c(range(s, na.rm=TRUE)[1], max)
 for(index in 1:n_I){
   png(filename = paste0(plot_dir, '/est_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  draw.density(w = w, index = index, P = P, 
+  draw.density(w = w, index = index, P = P,
                n_t = n_t, s = s, main = bquote("log spectral density: "*.(label[index])),
                zlim = zlim)
   dev.off()
-  
+
 }
 
 
