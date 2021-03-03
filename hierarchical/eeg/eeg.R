@@ -116,7 +116,7 @@ s_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
 sfStop()
 
 s_sample <- simplify2array(s_sample)
-s_quantile <- apply(s_sample, 1:3, quantile, c(0.025, 0.975))
+# s_quantile <- apply(s_sample, 1:3, quantile, c(0.025, 0.975))
 ## compute spectral density
 ## span of frequence
 w <- seq(0.001, 0.499, by = 0.001)

@@ -299,6 +299,6 @@ index <- 1
 png(filename = paste0(plot_dir, sim_index, '/scale/est_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier(w = w, index = index, P = P,
-                  n_t = n_t, s = s_mean, zlim = range(s_mean))
+                  n_t = n_t, s = s_mean[1, , ], zlim = range(s_mean))
 dev.off()
 
