@@ -67,11 +67,15 @@ result_parcor <- hparcor(yt = data_all, P = P, F2 = F2t,
                          chains = 1, DIC = TRUE, uncertainty = TRUE)
 
 ##########################################
-##### optimal model order
+##### optimal model order ############
 ##########################################
 P_opt <- which.min(result_parcor$DIC_fwd)
 cat("Optimal model order: ", P_opt)
 
+##########################################
+##### estimation of sigma2   ############
+##########################################
+est_sigma2 <- rep(result_parcor$sigma2t_fwd[n_t-P, P_opt], n_t)
 
 ###################################
 #### discount factor
@@ -101,11 +105,18 @@ coef_mean_sample <- lapply(1:sample_size, function(x) compute_TVAR(phi_fwd = res
 coef_mean_sample <- simplify2array(coef_mean_sample)
 
 
-coef_quantile <- apply(coef_sample, 1:3, quantile, c(0.025, 0.5, 0.975))
 
+library(snowfall)
+sfInit(parallel = TRUE, cpus=10, type="SOCK")
+sfLibrary(PARCOR)
+sfExport("w", "coef_sample", "sigma2")
+s_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
+                                                            phi = coef_sample[, , , x],
+                                                            sigma2 = est_sigma2))
+sfStop()
 
-
-
+s_sample <- simplify2array(s_sample)
+s_quantile <- apply(s_sample, 1:3, quantile, c(0.025, 0.975))
 ## compute spectral density
 ## span of frequence
 w <- seq(0.001, 0.499, by = 0.001)
@@ -113,12 +124,12 @@ w <- seq(0.001, 0.499, by = 0.001)
 ### spectral density of each time series
 s <- compute_sd(w = w,
                 phi = coef,
-                sigma2 = rep(result_parcor$sigma2t_fwd[n_t-P, P_opt], n_t))
+                sigma2 = est_sigma2)
 
 ### average of spectral density
 s_mean <- compute_sd(w=w,
                      phi= coef_mean,
-                     sigma2 = rep(result_parcor$sigma2t_fwd[n_t-P, P_opt], n_t))
+                     sigma2 = est_sigma2)
 
 
 ### draw ar coefficients
@@ -150,7 +161,8 @@ for(index in 1:n_I){
   png(filename = paste0(plot_dir, '/est_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw.density(w = w, index = index, P = P,
-               n_t = n_t, s = s, main = bquote("log spectral density: "*.(label[index])),
+               n_t = n_t, s = s[index, , ],
+               main = bquote("log spectral density: "*.(label[index])),
                zlim = zlim)
   dev.off()
 
