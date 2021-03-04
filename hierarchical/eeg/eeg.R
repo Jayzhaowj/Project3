@@ -5,16 +5,16 @@ plot_dir <- "/soe/wjzhao/project/Project3/hierarchical/eeg/plots/"
 # source(paste0(dir1, "draw_density_RcppVer.R"))
 library(PARCOR)
 
-# draw.density <- function(w, index, P, n_t, s, ...){
-#   x_coord <- seq(0, 1, length.out = n_t-2*P)
-#   y_coord <- w
-#   jet.colors <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F",
-#                                    "yellow", "#FF7F00", "red", "#7F0000"))
-#   filled.contour(x_coord, y_coord, s[[index]][(P+1):(n_t-P), ], xlab = 'time',
-#                  ylab = 'frequency',
-#                  color.palette = jet.colors, ...)
-#   cat('Graph has been drawn!\n')
-# }
+draw_density_hier_eeg <- function(w, index, P, n_t, s, ...){
+  x_coord <- seq(0, 1, length.out = n_t-2*P)
+  y_coord <- w
+  jet.colors <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F",
+                                   "yellow", "#FF7F00", "red", "#7F0000"))
+  filled.contour(x_coord, y_coord, s[(P+1):(n_t-P), ], xlab = 'time',
+                 ylab = 'frequency',
+                 color.palette = jet.colors, ...)
+  cat('Graph has been drawn!\n')
+}
 
 
 
@@ -83,11 +83,11 @@ est_sigma2 <- rep(result_parcor$sigma2t_fwd[n_t-P, P_opt], n_t)
 print(result_parcor$best_delta_fwd)
 
 ## compute ar coefficients
-coef_parcor <- PAR_to_AR_fun(phi_fwd = result_parcor$phi_fwd,
+coef_parcor <- run_dl(phi_fwd = result_parcor$phi_fwd,
                              phi_bwd = result_parcor$phi_bwd)
 coef <- coef_parcor[[P_opt]]$forward
 
-coef_parcor_mean <- PAR_to_AR_fun(phi_fwd = result_parcor$mu_fwd,
+coef_parcor_mean <- run_dl(phi_fwd = result_parcor$mu_fwd,
                                   phi_bwd = result_parcor$mu_bwd)
 
 coef_mean <- coef_parcor_mean[[P_opt]]$forward
@@ -95,39 +95,42 @@ coef_mean <- coef_parcor_mean[[P_opt]]$forward
 ##############################################
 ##### 95% credible interval
 ##############################################
-coef_sample <- lapply(1:sample_size, function(x) compute_TVAR(phi_fwd = result_parcor$phi_fwd_sample[x, , ,],
+coef_sample <- lapply(1:sample_size, function(x) compute_TVAR_hier(phi_fwd = result_parcor$phi_fwd_sample[x, , ,],
                                                               phi_bwd = result_parcor$phi_bwd_sample[x, , ,],
                                                               P_opt = P_opt))
 coef_sample <- simplify2array(coef_sample)
-coef_mean_sample <- lapply(1:sample_size, function(x) compute_TVAR(phi_fwd = result_parcor$mu_fwd_sample[x, , ,],
+coef_mean_sample <- lapply(1:sample_size, function(x) compute_TVAR_hier(phi_fwd = result_parcor$mu_fwd_sample[x, , ,],
                                                                    phi_bwd = result_parcor$mu_bwd_sample[x, , ,],
                                                                    P_opt = P_opt))
 coef_mean_sample <- simplify2array(coef_mean_sample)
 
 
 
+
+# s_quantile <- apply(s_sample, 1:3, quantile, c(0.025, 0.975))
+## compute spectral density
+## span of frequence
+w <- seq(0.001, 0.499, by = 0.001)
+
+
 library(snowfall)
 sfInit(parallel = TRUE, cpus=10, type="SOCK")
 sfLibrary(PARCOR)
-sfExport("w", "coef_sample", "sigma2")
+sfExport("w", "coef_sample", "est_sigma2")
 s_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
                                                             phi = coef_sample[, , , x],
                                                             sigma2 = est_sigma2))
 sfStop()
 
 s_sample <- simplify2array(s_sample)
-# s_quantile <- apply(s_sample, 1:3, quantile, c(0.025, 0.975))
-## compute spectral density
-## span of frequence
-w <- seq(0.001, 0.499, by = 0.001)
 
 ### spectral density of each time series
-s <- compute_sd(w = w,
+s <- cp_sd_uni(w = w,
                 phi = coef,
                 sigma2 = est_sigma2)
 
 ### average of spectral density
-s_mean <- compute_sd(w=w,
+s_mean <- cp_sd_uni(w=w,
                      phi= coef_mean,
                      sigma2 = est_sigma2)
 
@@ -156,15 +159,35 @@ s_mean <- compute_sd(w=w,
 #### for each channel
 library(Rfast)
 max <- max(unlist(lapply(s, function(x) nth(x, 2, descending=TRUE))))
-zlim <- c(range(s, na.rm=TRUE)[1], max)
+#zlim <- c(range(s, s_sample, na.rm=TRUE)[1], max)
 for(index in 1:n_I){
+  s_quantile <- apply(s_sample[index, , , ], 1:2, quantile, c(0.025, 0.975))
+  zlim <- c(range(s[index, , ], s_quantile), max)
   png(filename = paste0(plot_dir, '/est_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-  draw.density(w = w, index = index, P = P,
+  draw_density_hier_eeg(w = w, index = index, P = P,
                n_t = n_t, s = s[index, , ],
                main = bquote("log spectral density: "*.(label[index])),
                zlim = zlim)
   dev.off()
+
+  png(filename = paste0(plot_dir, '/est_lb_', index, 'st.png'))
+  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  draw_density_hier_eeg(w = w, index = index, P = P,
+               n_t = n_t, s = s_quantile[1, , ],
+               main = bquote("log spectral density: "*.(label[index])),
+               zlim = zlim)
+  dev.off()
+
+
+  png(filename = paste0(plot_dir, '/est_ub_', index, 'st.png'))
+  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  draw_density_hier_eeg(w = w, index = index, P = P,
+               n_t = n_t, s = s_quantile[1, , ],
+               main = bquote("log spectral density: "*.(label[index])),
+               zlim = zlim)
+  dev.off()
+
 
 }
 
