@@ -79,7 +79,7 @@ et <- .8
 sim <- gen.sim(n_t = n_t, n_I = n_I, P = P, vt = vt, et = et)
 yt <- sim$yt
 true_ar <- sim$phit
-true_ar_mean <- (0.1*(1:n_t)/n_t + 0.85)*cos(2*pi/sim$lambdat_mu)
+true_ar_mean <- array(cbind((0.1*(1:n_t)/n_t + 0.85)*cos(2*pi/sim$lambdat_mu), -0.9^2), dim = c(1, n_t, 2))
 
 #################################
 #### draw time series and
@@ -107,10 +107,11 @@ delta_matrix <- as.matrix(expand.grid(delta, delta))
 #                              F2 = F2t)
 
 sample_size <- 1000
+ptm <- proc.time()
 result_parcor <- hparcor(yt = yt, delta = delta_matrix,
                          P = 5, F2 = F2t, sample_size = sample_size,
                          chains = 10, DIC = TRUE, uncertainty = TRUE)
-
+print(proc.time() - ptm)
 ###########################
 ##### Optimal model order
 ###########################
@@ -173,7 +174,7 @@ s_mean <- cp_sd_uni(w=w,
 
 ### True spectral density
 s_true <- cp_sd_uni(phi=true_ar, sigma2 = rep(et, n_t), w=w)
-
+s_mean_true <- cp_sd_uni(phi=true_ar_mean, sigma2=rep(et,n_t), w=w)
 
 
 library(snowfall)
@@ -296,9 +297,16 @@ for(i in 1:n_I){
 
 #### for baseline of all five time series
 index <- 1
+zlim <- range(s_mean[1, ,], s_mean_true[1, , ])
 png(filename = paste0(plot_dir, sim_index, '/scale/est_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier(w = w, index = index, P = P,
-                  n_t = n_t, s = s_mean[1, , ], zlim = range(s_mean))
+                  n_t = n_t, s = s_mean[1, , ], zlim = zlim)
 dev.off()
 
+
+png(filename = paste0(plot_dir, sim_index, '/scale/true_', index, 'mean.png'))
+par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+draw_density_hier(w = w, index = index, P = P,
+                  n_t = n_t, s = s_mean_true[1, , ], zlim = zlim)
+dev.off()

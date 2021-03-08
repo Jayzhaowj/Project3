@@ -162,7 +162,7 @@ max <- max(unlist(lapply(s, function(x) nth(x, 2, descending=TRUE))))
 #zlim <- c(range(s, s_sample, na.rm=TRUE)[1], max)
 for(index in 1:n_I){
   s_quantile <- apply(s_sample[index, , , ], 1:2, quantile, c(0.025, 0.975))
-  zlim <- c(range(s[index, , ], s_quantile), max)
+  #zlim <- c(range(s[index, , ], s_quantile), max)
   png(filename = paste0(plot_dir, '/est_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_eeg(w = w, index = index, P = P,
