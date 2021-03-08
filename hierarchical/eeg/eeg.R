@@ -4,6 +4,9 @@ plot_dir <- "/soe/wjzhao/project/Project3/hierarchical/eeg/plots/"
 # source(paste0(dir1, 'hier_PARCOR_cpp.R'))
 # source(paste0(dir1, "draw_density_RcppVer.R"))
 library(PARCOR)
+library(snowfall)
+
+
 
 draw_density_hier_eeg <- function(w, index, P, n_t, s, ...){
   x_coord <- seq(0, 1, length.out = n_t-2*P)
@@ -103,17 +106,11 @@ coef_mean_sample <- lapply(1:sample_size, function(x) compute_TVAR_hier(phi_fwd 
                                                                    phi_bwd = result_parcor$mu_bwd_sample[x, , ,],
                                                                    P_opt = P_opt))
 coef_mean_sample <- simplify2array(coef_mean_sample)
+coef_mean_sample <- coef_mean_sample[1, , , , drop = FALSE]
 
-
-
-
-# s_quantile <- apply(s_sample, 1:3, quantile, c(0.025, 0.975))
 ## compute spectral density
 ## span of frequence
 w <- seq(0.001, 0.499, by = 0.001)
-
-
-library(snowfall)
 sfInit(parallel = TRUE, cpus=10, type="SOCK")
 sfLibrary(PARCOR)
 sfExport("w", "coef_sample", "est_sigma2")
@@ -123,7 +120,16 @@ s_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
 sfStop()
 
 s_sample <- simplify2array(s_sample)
-
+####################
+sfInit(parallel = TRUE, cpus=10, type="SOCK")
+sfLibrary(PARCOR)
+sfExport("w", "coef_mean_sample", "est_sigma2", "n_t", "P_opt")
+s_mean_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
+                                                                 phi=array(coef_mean_sample[1, , , x],
+                                                                           dim = c(1, n_t, P_opt)),
+                                                                 sigma2=est_sigma2))
+sfStop()
+s_mean_sample <- simplify2array(s_mean_sample)
 ### spectral density of each time series
 s <- cp_sd_uni(w = w,
                 phi = coef,
@@ -133,6 +139,19 @@ s <- cp_sd_uni(w = w,
 s_mean <- cp_sd_uni(w=w,
                      phi= coef_mean,
                      sigma2 = est_sigma2)
+
+######################################################
+### compute 95% credible interval of spectral density
+######################################################
+s_quantile <- rep(list(NA), n_I)
+for(i in 1:n_I){
+  s_quantile[[i]] <- apply(s_sample[i, , , ], 1:2, quantile, c(0.025, 0.975))
+}
+
+s_mean_quantile <- apply(s_mean_sample[1, , , ], 1:2, quantile, c(0.025, 0.975))
+
+
+
 
 
 ### draw ar coefficients
@@ -158,12 +177,13 @@ s_mean <- cp_sd_uni(w=w,
 #### compute spectral density #####
 #### for each channel
 library(Rfast)
-max <- max(unlist(lapply(s, function(x) nth(x, 2, descending=TRUE))))
+#max <- max(unlist(lapply(s, function(x) nth(x, 2, descending=TRUE))))
 #zlim <- c(range(s, s_sample, na.rm=TRUE)[1], max)
+zlim <- c(range(s, s_quantile, s_mean_quantile))
+
 for(index in 1:n_I){
-  s_quantile <- apply(s_sample[index, , , ], 1:2, quantile, c(0.025, 0.975))
   #zlim <- c(range(s[index, , ], s_quantile), max)
-  png(filename = paste0(plot_dir, '/est_', index, 'st.png'))
+  png(filename = paste0(plot_dir, '/est_mean_ch_', label[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_eeg(w = w, index = index, P = P,
                n_t = n_t, s = s[index, , ],
@@ -171,19 +191,19 @@ for(index in 1:n_I){
                zlim = zlim)
   dev.off()
 
-  png(filename = paste0(plot_dir, '/est_lb_', index, 'st.png'))
+  png(filename = paste0(plot_dir, '/est_lb_ch_', label[index], 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_eeg(w = w, index = index, P = P,
-               n_t = n_t, s = s_quantile[1, , ],
+               n_t = n_t, s = s_quantile[[index]][1, , ],
                main = bquote("log spectral density: "*.(label[index])),
                zlim = zlim)
   dev.off()
 
 
-  png(filename = paste0(plot_dir, '/est_ub_', index, 'st.png'))
+  png(filename = paste0(plot_dir, '/est_ub_ch_', label[index], 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_eeg(w = w, index = index, P = P,
-               n_t = n_t, s = s_quantile[1, , ],
+               n_t = n_t, s = s_quantile[[index]][2, , ],
                main = bquote("log spectral density: "*.(label[index])),
                zlim = zlim)
   dev.off()
@@ -192,10 +212,30 @@ for(index in 1:n_I){
 }
 
 
-#### for mean of two time series
+#### for mean of baseline spectral density
 index <- 1
 png(filename = paste0(plot_dir, '/est_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
-draw.density(w = w, index = index, P = P, main = "log spectral density of mean",
-             n_t = n_t, s = s_mean, zlim = zlim)
+draw_density_hier_eeg(w = w, index = index, P = P,
+                      main = "log spectral density of mean",
+                      n_t = n_t, s = s_mean, zlim = zlim)
 dev.off()
+
+##### 95% credible interval of baseline spectral density
+index <- 1
+png(filename = paste0(plot_dir, '/est_lb_', index, 'mean.png'))
+par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+draw_density_hier_eeg(w = w, index = index, P = P,
+                      main = "log spectral density of mean",
+                      n_t = n_t, s = s_mean_quantile[1, , ], zlim = zlim)
+dev.off()
+
+
+index <- 1
+png(filename = paste0(plot_dir, '/est_ub_', index, 'mean.png'))
+par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+draw_density_hier_eeg(w = w, index = index, P = P,
+                      main = "log spectral density of mean",
+                      n_t = n_t, s = s_mean_quantile[2, , ], zlim = zlim)
+dev.off()
+

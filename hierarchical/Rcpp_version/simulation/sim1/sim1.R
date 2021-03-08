@@ -7,6 +7,7 @@ plot_dir <- "/soe/wjzhao/project/Project3/hierarchical/plots/Rcpp/"
 
 library(matrixcalc)
 library(PARCOR)
+library(snowfall)
 
 ########################################
 ##### simulation 4
@@ -177,8 +178,10 @@ s_true <- cp_sd_uni(phi=true_ar, sigma2 = rep(et, n_t), w=w)
 s_mean_true <- cp_sd_uni(phi=true_ar_mean, sigma2=rep(et,n_t), w=w)
 
 
-library(snowfall)
-sfInit(parallel = TRUE, cpus=20, type="SOCK")
+####################################
+#### sample spectral density
+####################################
+sfInit(parallel = TRUE, cpus=10, type="SOCK")
 sfLibrary(PARCOR)
 sfExport("w", "coef_sample", "sigma2")
 s_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
@@ -187,9 +190,19 @@ s_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
 sfStop()
 
 s_sample <- simplify2array(s_sample)
-#s_quantile <- apply(s_sample, 1:3, quantile, c(0.025, 0.975))
 
-dev.new()
+sfInit(parallel = TRUE, cpus=10, type="SOCK")
+sfLibrary(PARCOR)
+sfExport("w", "coef_mean_sample", "sigma2", "n_t", "P_opt")
+s_mean_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
+                                                            phi = array(coef_mean_sample[1, , , x],
+                                                                        dim = c(1, n_t, P_opt)),
+                                                            sigma2 = sigma2))
+sfStop()
+
+s_mean_sample <- simplify2array(s_mean_sample)
+
+
 
 ### draw ar coefficients
 
@@ -252,18 +265,28 @@ dev.off()
 # }
 # dev.off()
 
+
+######################################################
+### compute 95% credible interval of spectral density
+######################################################
+s_quantile <- rep(list(NA), n_I)
+for(i in 1:n_I){
+  s_quantile[[i]] <- apply(s_sample[i, , , ], 1:2, quantile, c(0.025, 0.975))
+}
+
+s_mean_quantile <- apply(s_mean_sample[1, , , ], 1:2, quantile, c(0.025, 0.975))
+
 #####################################
 ## draw spectral density plots
 #####################################
 #### compute spectral density #####
 #### for time series for all 5 time series
-
+zlim <- range(s, s_quantile, s_mean_quantile, s_true, s_mean_true)
 for(i in 1:n_I){
   index <- i
-  s_quantile <- apply(s_sample[i, , , ], 1:2, quantile, c(0.025, 0.975))
-  zlim <- range(s[index, (P+1):(n_t-P),],
-                s_quantile[, (P+1):(n_t-P),],
-                s_true[index, (P+1):(n_t-P), ])
+  # zlim <- range(s[index, (P+1):(n_t-P),],
+  #               s_quantile[, (P+1):(n_t-P),],
+  #               s_true[index, (P+1):(n_t-P), ])
   png(filename = paste0(plot_dir, sim_index, '/scale/est_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier(w = w, index = index, P = P,
@@ -297,7 +320,7 @@ for(i in 1:n_I){
 
 #### for baseline of all five time series
 index <- 1
-zlim <- range(s_mean[1, ,], s_mean_true[1, , ])
+# zlim <- range(s_mean[1, ,], s_mean_true[1, , ])
 png(filename = paste0(plot_dir, sim_index, '/scale/est_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier(w = w, index = index, P = P,
@@ -309,4 +332,25 @@ png(filename = paste0(plot_dir, sim_index, '/scale/true_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier(w = w, index = index, P = P,
                   n_t = n_t, s = s_mean_true[1, , ], zlim = zlim)
+dev.off()
+
+
+
+
+#### for baseline of all five time series
+index <- 1
+# zlim <- range(s_mean[1, ,], s_mean_true[1, , ])
+png(filename = paste0(plot_dir, sim_index, '/scale/est_lb_', index, 'mean.png'))
+par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+draw_density_hier(w = w, index = index, P = P,
+                  n_t = n_t, s = s_mean_quantile[1, , ], zlim = zlim)
+dev.off()
+
+#### for baseline of all five time series
+index <- 1
+# zlim <- range(s_mean[1, ,], s_mean_true[1, , ])
+png(filename = paste0(plot_dir, sim_index, '/scale/est_ub_', index, 'mean.png'))
+par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+draw_density_hier(w = w, index = index, P = P,
+                  n_t = n_t, s = s_mean_quantile[2, , ], zlim = zlim)
 dev.off()
