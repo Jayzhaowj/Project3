@@ -146,6 +146,7 @@ s_mean <- cp_sd_uni(w=w,
 s_quantile <- rep(list(NA), n_I)
 for(i in 1:n_I){
   s_quantile[[i]] <- apply(s_sample[i, , , ], 1:2, quantile, c(0.025, 0.975))
+  cat("\n iterations: ", i, "/", n_I)
 }
 
 s_mean_quantile <- apply(s_mean_sample[1, , , ], 1:2, quantile, c(0.025, 0.975))
