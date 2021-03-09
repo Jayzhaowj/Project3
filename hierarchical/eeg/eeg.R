@@ -219,7 +219,7 @@ png(filename = paste0(plot_dir, '/est_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier_eeg(w = w, index = index, P = P,
                       main = "log spectral density of mean",
-                      n_t = n_t, s = s_mean, zlim = zlim)
+                      n_t = n_t, s = s_mean[1, , ], zlim = zlim)
 dev.off()
 
 ##### 95% credible interval of baseline spectral density
