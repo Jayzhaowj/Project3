@@ -304,14 +304,14 @@ for(i in 1:n_I){
   png(filename = paste0(plot_dir, sim_index, '/scale/ql_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier(w = w, index = index, P = P,
-                    n_t = n_t, s = s_quantile[1, , ], zlim = zlim)
+                    n_t = n_t, s = s_quantile[[i]][1, , ], zlim = zlim)
   dev.off()
 
 
   png(filename = paste0(plot_dir, sim_index, '/scale/qu_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier(w = w, index = index, P = P,
-               n_t = n_t, s = s_quantile[2, , ], zlim = zlim)
+               n_t = n_t, s = s_quantile[[i]][2, , ], zlim = zlim)
   dev.off()
 }
 
