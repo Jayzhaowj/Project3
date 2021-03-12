@@ -94,12 +94,8 @@ for(i in 1:n_I){
 #########################
 ###### fit model #######
 #########################
-F2t <- matrix(1, nrow = n_I, ncol = n_I)
-F2t[1:4, 2:5] <- diag(4)
-F2t[5, ] <- -1*F2t[5, ]
-F2t[5,1] <- 1
 
-delta <- seq(0.99, 0.999, 0.002)
+delta <- seq(0.99, 0.999, 0.001)
 delta_matrix <- as.matrix(expand.grid(delta, delta))
 # delta_matrix <- cbind(replicate(2, delta_matrix_tmp[, 1]),
 #                       delta_matrix_tmp)
@@ -110,7 +106,7 @@ delta_matrix <- as.matrix(expand.grid(delta, delta))
 sample_size <- 1000
 ptm <- proc.time()
 result_parcor <- hparcor(yt = yt, delta = delta_matrix,
-                         P = 5, F2 = F2t, sample_size = sample_size,
+                         P = 5, sample_size = sample_size,
                          chains = 10, DIC = TRUE, uncertainty = TRUE)
 print(proc.time() - ptm)
 ###########################
