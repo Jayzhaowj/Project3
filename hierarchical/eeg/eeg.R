@@ -61,11 +61,10 @@ sample_size <- 1000
 n_t <- 3600
 n_I <- 9
 P <- 15
-F2t_m <- data.frame(a = gl(n_I, 1))
-F2t <- as.matrix(model.matrix(~a, F2t_m, contrasts = list(a = "contr.sum")))
+
 delta <- seq(0.99, 0.999, by = 0.001)
 delta_matrix <- as.matrix(expand.grid(delta, delta))
-result_parcor <- hparcor(yt = data_all, P = P, F2 = F2t,
+result_parcor <- hparcor(yt = data_all, P = P,
                          delta = delta_matrix, sample_size = sample_size,
                          chains = 1, DIC = TRUE, uncertainty = TRUE)
 
