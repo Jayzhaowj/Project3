@@ -42,8 +42,6 @@ vignettes/*.pdf
 .Rproj
 
 # data
-.set
-.fdt
-.mat
+/hierarchical/walking_EEG/data/
 
 
