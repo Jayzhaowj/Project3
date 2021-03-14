@@ -12,7 +12,7 @@ load(file = paste0(getwd(), "/data/S", subject_id, ".RData"))
 cond_type <- "walk_rotate"
 cluster_area <- EEG_data[[cond_type]]$names
 times <- EEG_data[[cond_type]]$times
-data <- EEG_data[[cond_type]]$data[, 1:100, 1:5]
+data <- EEG_data[[cond_type]]$data
 
 ####### potential model order ########
 P <- 10
