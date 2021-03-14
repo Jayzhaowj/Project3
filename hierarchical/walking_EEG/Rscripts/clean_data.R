@@ -30,7 +30,7 @@ subjects <- sapply(1:30, function(x) labels[subjects_ind[x, ]])
 
 ###### clean data function #######
 clean_data <- function(file_name, subjects_index){
-  eeg_data <- rep(list(list(data = NA, names = NA)), 4)
+  eeg_data <- rep(list(list(data = NA, names = NA, times = NA)), 4)
   for(i in 1:4){
     path_set <- paste0(root_dir, "/data/", cond_types[i], "/", file_name)
     EEG <- readMat(path_set)
@@ -41,15 +41,15 @@ clean_data <- function(file_name, subjects_index){
     ### number of epochs
     n_trials <- EEG$EEG[[which(var_names == "trials")]]
     ### number of time points
-    n_times <- EEG$EEG[[which(var_names == "times")]]
-    
+    times <- EEG$EEG[[which(var_names == "times")]]
+    n_times <- length(times)
     ### load fdt file
     fdt_name <- unlist(EEG$EEG[[which(var_names=="datfile")]])
     path_fdt <- paste0(root_dir, "/data/", cond_types[i], "/", fdt_name)
     fdt_file <- file(path_fdt, "rb")
     signals <- readBin(fdt_file,
                        "double",
-                       n = n_chans * n_trials * length(n_times),
+                       n = n_chans * n_trials * n_times,
                        size = 4,
                        endian = "little")
     close(fdt_file)
@@ -60,13 +60,13 @@ clean_data <- function(file_name, subjects_index){
       print(paste0("number of clusters in clusters: ", length(subjects[[subjects_index]])+8))
       stop("differernt cluster number")
     }
-    dim(signals) <- c(n_chans, length(n_times), max(n_trials, 1))
+    dim(signals) <- c(n_chans, n_times, max(n_trials, 1))
     eeg_data[[i]]$data <- signals[(1:length(subjects[[subjects_index]])), ,]
     eeg_data[[i]]$names <- subjects[[subjects_index]]
-    cat("\n The Perturbation condition: ", cond_types[i], 
-                 "\n")
+    eeg_data[[i]]$times <- times
+    cat("\n The Perturbation condition: ", cond_types[i], "\n")
     cat("\n Number of cluster: ", n_chans, "\n")
-    cat("\n Number of time points: ", length(n_times), "\n")
+    cat("\n Number of time points: ", n_times, "\n")
     cat("\n Number of epochs: ", n_trials, "\n")
   }
   names(eeg_data) <- cond_types
@@ -81,6 +81,7 @@ for(i in iter_index){
   EEG_data <- clean_data(file_name = file_name, subjects_index = i)
   save("EEG_data", file = paste0(root_dir, "/data/S", i, ".RData"))
   cat("\n The subject ", i, " has been retrieved. \n")
+  cat("\n ========================================== \n")
 }
 sink()
 
