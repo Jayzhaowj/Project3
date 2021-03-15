@@ -12,7 +12,12 @@ load(file = paste0(getwd(), "/data/S", subject_id, ".RData"))
 cond_type <- "stand_pull"
 cluster_area <- EEG_data[[cond_type]]$names
 times <- EEG_data[[cond_type]]$times
-data <- EEG_data[[cond_type]]$data
+raw_data <- EEG_data[[cond_type]]$data
+#data <- raw_data
+
+### do the first difference
+data_diff <- apply(raw_data, c(1,3), diff)
+data <- aperm(data_diff, c(2,1,3))
 
 ####### potential model order ########
 P <- 10
