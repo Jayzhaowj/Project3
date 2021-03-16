@@ -23,7 +23,7 @@ data <- aperm(data_diff, c(2,1,3))
 P <- 10
 
 ####### sample size ##########
-sample_size <- 100
+sample_size <- 500
 ####### construct discount factor #########
 delta <- seq(0.995, 0.999, by = 0.001)
 delta_matrix <- as.matrix(expand.grid(delta, delta))
