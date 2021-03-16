@@ -67,7 +67,7 @@ hparcor <- function(yt, delta, P, F2, sample_size = 1000L, chains, DIC = TRUE, u
     sigma2t_bwd[, j] <- best_bwd$sigma2t
     DIC_fwd <- 2*(cumsum(pDIC_fwd) - best_pred_dens_fwd)
     DIC_bwd <- 2*(cumsum(pDIC_bwd) - best_pred_dens_bwd)
-    cat('\niter: ', j)
+    cat('\n The stage ', j, 'of computation has been finished!')
 
 
   }
