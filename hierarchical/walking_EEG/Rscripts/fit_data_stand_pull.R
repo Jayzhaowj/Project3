@@ -94,4 +94,12 @@ for(i in 1:n_I){
 }
 sfStop()
 
+sink(file=paste0(root_dir, "/results/", cond_type, "_S", subject_id, ".txt"))
+cat("Optimal model order:", P_opt)
+for(i in 1:length(result)){
+  cat("Selected forward discount factor of area", cluster_area[i], ":", result[[i]]$best_delta_fwd)
+  cat("Selected backward discount factor of area", cluster_area[i], ":", result[[i]]$best_delta_bwd)
+}
+sink()
+
 save("s_mean", "s_mean_quantile", file = paste0(root_dir, "/results/", cond_type, "_S", subject_id, ".RData"))
