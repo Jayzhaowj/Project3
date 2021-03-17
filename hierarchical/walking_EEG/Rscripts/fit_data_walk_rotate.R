@@ -13,11 +13,13 @@ cond_type <- "walk_rotate"
 cluster_area <- EEG_data[[cond_type]]$names
 times <- EEG_data[[cond_type]]$times
 raw_data <- EEG_data[[cond_type]]$data
-#data <- raw_data
+data <- raw_data
+is_difference <- "FALSE"
 
-### do the first difference
-data_diff <- apply(raw_data, c(1,3), diff)
-data <- aperm(data_diff, c(2,1,3))
+# ### do the first difference
+# data_diff <- apply(raw_data, c(1,3), diff)
+# data <- aperm(data_diff, c(2,1,3))
+# is_difference <- "TRUE"
 
 ####### potential model order ########
 P <- 10
@@ -96,6 +98,7 @@ sfStop()
 
 
 sink(file=paste0(root_dir, "/results/", cond_type, "_S", subject_id, ".txt"))
+cat("\n The first order difference:", is_difference, "\n")
 cat("\n Optimal model order:", P_opt, "\n")
 cat("\n Computation time: ", consumed_time, "\n")
 for(i in 1:length(result)){
@@ -104,4 +107,4 @@ for(i in 1:length(result)){
 }
 sink()
 
-save("s_mean", "s_mean_quantile", file = paste0(root_dir, "/results/", cond_type, "_S", subject_id, ".RData"))
+save("s_mean", "s_mean_quantile", "is_difference", file = paste0(root_dir, "/results/", cond_type, "_S", subject_id, ".RData"))

@@ -47,7 +47,7 @@ diff_times <- as.numeric(times[1, 1:n_t+1])
 load(file = paste0(root_dir, "/results/", cond_type, "_S", subject_id, ".RData"))
 
 ######### plot directory ########
-plot_dir <- paste0(root_dir, "/results/plots/", cond_type)
+plot_dir <- paste0(root_dir, "/results/plots/subject_", subject_id, "/", cond_type)
 
 ######### span of frequency #########
 w <- seq(0.001, 0.499, by = 0.001)
@@ -102,14 +102,14 @@ diff_times <- as.numeric(times[1, 1:n_t+1])
 load(file = paste0(root_dir, "/results/", cond_type, "_S", subject_id, ".RData"))
 
 ######### plot directory ########
-plot_dir <- paste0(root_dir, "/results/plots/", cond_type)
+plot_dir <- paste0(root_dir, "/results/plots/subject_", subject_id, "/", cond_type)
 
 
 ########
 
 
 for(index in 1:dim(data)[1]){
-  png(filename = paste0(plot_dir, '/mean/est_mean_ch_', cluster_area[index], '.png'))
+  png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean[[index]][1, , ],
@@ -117,7 +117,7 @@ for(index in 1:dim(data)[1]){
                          zlim = zlim)
   dev.off()
   
-  png(filename = paste0(plot_dir, '/lb/est_lb_ch_', cluster_area[index], '.png'))
+  png(filename = paste0(plot_dir, '/est_lb_ch_', cluster_area[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean_quantile[[index]][1, , ],
@@ -126,7 +126,7 @@ for(index in 1:dim(data)[1]){
   dev.off()
   
   
-  png(filename = paste0(plot_dir, '/ub/est_ub_ch_', cluster_area[index], '.png'))
+  png(filename = paste0(plot_dir, '/est_ub_ch_', cluster_area[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_wEEG(w = w,  P = P, times=times,
                          n_t = n_t, s = s_mean_quantile[[index]][2, , ],
@@ -155,14 +155,14 @@ diff_times <- as.numeric(times[1, 1:n_t+1])
 load(file = paste0(root_dir, "/results/", cond_type, "_S", subject_id, ".RData"))
 
 ######### plot directory ########
-plot_dir <- paste0(root_dir, "/results/plots/", cond_type)
+plot_dir <- paste0(root_dir, "/results/plots/subject_", subject_id, "/", cond_type)
 
 
 ########
 
 
 for(index in 1:dim(data)[1]){
-  png(filename = paste0(plot_dir, '/mean/est_mean_ch_', cluster_area[index], '.png'))
+  png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean[[index]][1, , ],
@@ -170,7 +170,7 @@ for(index in 1:dim(data)[1]){
                          zlim = zlim)
   dev.off()
   
-  png(filename = paste0(plot_dir, '/lb/est_lb_ch_', cluster_area[index], '.png'))
+  png(filename = paste0(plot_dir, '/est_lb_ch_', cluster_area[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean_quantile[[index]][1, , ],
@@ -179,7 +179,7 @@ for(index in 1:dim(data)[1]){
   dev.off()
   
   
-  png(filename = paste0(plot_dir, '/ub/est_ub_ch_', cluster_area[index], '.png'))
+  png(filename = paste0(plot_dir, '/est_ub_ch_', cluster_area[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_wEEG(w = w,  P = P, times=times,
                          n_t = n_t, s = s_mean_quantile[[index]][2, , ],
@@ -211,14 +211,14 @@ diff_times <- as.numeric(times[1, 1:n_t+1])
 load(file = paste0(root_dir, "/results/", cond_type, "_S", subject_id, ".RData"))
 
 ######### plot directory ########
-plot_dir <- paste0(root_dir, "/results/plots/", cond_type)
+plot_dir <- paste0(root_dir, "/results/plots/subject_", subject_id, "/", cond_type)
 
 
 ########
 
 
 for(index in 1:dim(data)[1]){
-  png(filename = paste0(plot_dir, '/mean/est_mean_ch_', cluster_area[index], '.png'))
+  png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean[[index]][1, , ],
@@ -226,7 +226,7 @@ for(index in 1:dim(data)[1]){
                          zlim = zlim)
   dev.off()
   
-  png(filename = paste0(plot_dir, '/lb/est_lb_ch_', cluster_area[index], '.png'))
+  png(filename = paste0(plot_dir, '/est_lb_ch_', cluster_area[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean_quantile[[index]][1, , ],
@@ -235,7 +235,7 @@ for(index in 1:dim(data)[1]){
   dev.off()
   
   
-  png(filename = paste0(plot_dir, '/ub/est_ub_ch_', cluster_area[index], '.png'))
+  png(filename = paste0(plot_dir, '/est_ub_ch_', cluster_area[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_wEEG(w = w,  P = P, times=times,
                          n_t = n_t, s = s_mean_quantile[[index]][2, , ],
