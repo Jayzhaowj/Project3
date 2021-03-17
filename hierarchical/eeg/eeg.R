@@ -9,8 +9,10 @@ library(snowfall)
 
 
 draw_density_hier_eeg <- function(w, index, P, n_t, s, ...){
-  x_coord <- seq(0, 1, length.out = n_t-2*P)
-  y_coord <- w
+  constant1 <- 83.72/3600
+  x_coord <- seq(constant1*P, 83.72 - constant1*P, length.out = n_t - 2 * P)
+  constant2 <- 3600/(256/5)
+  y_coord <- constant2 * w
   jet.colors <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F",
                                    "yellow", "#FF7F00", "red", "#7F0000"))
   filled.contour(x_coord, y_coord, s[(P+1):(n_t-P), ], xlab = 'time',
@@ -191,7 +193,7 @@ for(index in 1:n_I){
                zlim = zlim)
   dev.off()
 
-  png(filename = paste0(plot_dir, '/est_lb_ch_', label[index], 'st.png'))
+  png(filename = paste0(plot_dir, '/est_lb_ch_', label[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_eeg(w = w, index = index, P = P,
                n_t = n_t, s = s_quantile[[index]][1, , ],
@@ -200,7 +202,7 @@ for(index in 1:n_I){
   dev.off()
 
 
-  png(filename = paste0(plot_dir, '/est_ub_ch_', label[index], 'st.png'))
+  png(filename = paste0(plot_dir, '/est_ub_ch_', label[index], '.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier_eeg(w = w, index = index, P = P,
                n_t = n_t, s = s_quantile[[index]][2, , ],

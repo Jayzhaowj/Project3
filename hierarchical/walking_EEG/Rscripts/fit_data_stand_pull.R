@@ -95,10 +95,11 @@ for(i in 1:n_I){
 sfStop()
 
 sink(file=paste0(root_dir, "/results/", cond_type, "_S", subject_id, ".txt"))
-cat("Optimal model order:", P_opt)
+cat("\n Optimal model order:", P_opt, "\n")
+cat("\n Computation time: ", consumed_time, "\n")
 for(i in 1:length(result)){
-  cat("Selected forward discount factor of area", cluster_area[i], ":", result[[i]]$best_delta_fwd)
-  cat("Selected backward discount factor of area", cluster_area[i], ":", result[[i]]$best_delta_bwd)
+  cat("\n Selected forward discount factor of area", cluster_area[i], ":", result[[i]]$best_delta_fwd, "\n")
+  cat("\n Selected backward discount factor of area", cluster_area[i], ":", result[[i]]$best_delta_bwd, "\n")
 }
 sink()
 
