@@ -26,7 +26,7 @@ P <- 10
 ####### sample size ##########
 sample_size <- 100
 ####### construct discount factor #########
-delta <- seq(0.99, 0.999, by = 0.001)
+delta <- seq(0.9, 0.999, by = 0.005)
 delta_matrix <- as.matrix(expand.grid(delta, delta))
 
 ####### set up parameters for number of time series and number of time points ######

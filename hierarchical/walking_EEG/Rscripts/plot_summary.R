@@ -9,7 +9,10 @@ draw_density_hier_wEEG <- function(w, times, P, n_t, s, ...){
   filled.contour(times[(P+1):(n_t-P)]/1000, y_coord, s[(P+1):(n_t-P), ], 
                  xlab = 'time (s)',
                  ylab = 'frequency (Hz)',
-                 color.palette = jet.colors, ...)
+                 color.palette = jet.colors, 
+                 plot.title = {title(xlab="time (s)", ylab = "frequency (Hz)", main = main)
+                               abline(v=c(0, 1), col = 'black', lty = 2)})
+  
   cat('Graph has been drawn!\n')
 }
 
@@ -53,31 +56,33 @@ plot_dir <- paste0(root_dir, "/results/plots/subject_", subject_id, "/", cond_ty
 w <- seq(0.001, 0.499, by = 0.001)
 
 ######### range of zlim ##########
-zlim <- c(-2, 10)
+zlim <- c(-3, 10)
 
+cex <- 2
 for(index in 1:dim(data)[1]){
+  main <- cluster_area[index]
   png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean[[index]][1, , ],
-                         main = bquote("log spectral density: "*.(cluster_area[index])),
+                         main = main,
                          zlim = zlim)
   dev.off()
   
   png(filename = paste0(plot_dir, '/est_lb_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                         n_t = n_t, s = s_mean_quantile[[index]][1, , ],
-                        main = bquote("log spectral density: "*.(cluster_area[index])),
+                        main = main,
                         zlim = zlim)
   dev.off()
   
   
   png(filename = paste0(plot_dir, '/est_ub_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w,  P = P, times=times,
                         n_t = n_t, s = s_mean_quantile[[index]][2, , ],
-                        main = bquote("log spectral density: "*.(cluster_area[index])),
+                        main = main,
                         zlim = zlim)
   dev.off()
 }
@@ -109,28 +114,29 @@ plot_dir <- paste0(root_dir, "/results/plots/subject_", subject_id, "/", cond_ty
 
 
 for(index in 1:dim(data)[1]){
+  main <- cluster_area[index]
   png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean[[index]][1, , ],
-                         main = bquote("log spectral density: "*.(cluster_area[index])),
+                         main = main,
                          zlim = zlim)
   dev.off()
   
   png(filename = paste0(plot_dir, '/est_lb_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean_quantile[[index]][1, , ],
-                         main = bquote("log spectral density: "*.(cluster_area[index])),
+                         main = main,
                          zlim = zlim)
   dev.off()
   
   
   png(filename = paste0(plot_dir, '/est_ub_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w,  P = P, times=times,
                          n_t = n_t, s = s_mean_quantile[[index]][2, , ],
-                         main = bquote("log spectral density: "*.(cluster_area[index])),
+                         main = main,
                          zlim = zlim)
   dev.off()
 }
@@ -162,28 +168,29 @@ plot_dir <- paste0(root_dir, "/results/plots/subject_", subject_id, "/", cond_ty
 
 
 for(index in 1:dim(data)[1]){
+  main <- cluster_area[index]
   png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean[[index]][1, , ],
-                         main = bquote("log spectral density: "*.(cluster_area[index])),
+                         main = main,
                          zlim = zlim)
   dev.off()
   
   png(filename = paste0(plot_dir, '/est_lb_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean_quantile[[index]][1, , ],
-                         main = bquote("log spectral density: "*.(cluster_area[index])),
+                         main = main,
                          zlim = zlim)
   dev.off()
   
   
   png(filename = paste0(plot_dir, '/est_ub_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w,  P = P, times=times,
                          n_t = n_t, s = s_mean_quantile[[index]][2, , ],
-                         main = bquote("log spectral density: "*.(cluster_area[index])),
+                         main = main,
                          zlim = zlim)
   dev.off()
 }
@@ -218,28 +225,30 @@ plot_dir <- paste0(root_dir, "/results/plots/subject_", subject_id, "/", cond_ty
 
 
 for(index in 1:dim(data)[1]){
+  main <- cluster_area[index]
   png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean[[index]][1, , ],
-                         main = bquote("log spectral density: "*.(cluster_area[index])),
+                         main = main,
                          zlim = zlim)
   dev.off()
   
   png(filename = paste0(plot_dir, '/est_lb_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w, P = P, times = times,
                          n_t = n_t, s = s_mean_quantile[[index]][1, , ],
-                         main = bquote("log spectral density: "*.(cluster_area[index])),
+                         main = main,
                          zlim = zlim)
   dev.off()
   
   
   png(filename = paste0(plot_dir, '/est_ub_ch_', cluster_area[index], '.png'))
-  par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w,  P = P, times=times,
                          n_t = n_t, s = s_mean_quantile[[index]][2, , ],
-                         main = bquote("log spectral density: "*.(cluster_area[index])),
+                         main = main,
                          zlim = zlim)
   dev.off()
 }
+
