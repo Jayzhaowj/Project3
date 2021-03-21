@@ -4,7 +4,7 @@ library(snowfall)
 root_dir <- getwd()
 
 ######## subject id #######
-subject_id <- 25
+subject_id <- 6
 load(file = paste0(root_dir, "/data/S", subject_id, ".RData"))
 
 
@@ -27,7 +27,7 @@ P <- 10
 ####### sample size ##########
 sample_size <- 100
 ####### construct discount factor #########
-delta <- seq(0.9, 0.999, by = 0.005)
+delta <- seq(0.9, 0.99, by = 0.005)
 delta_matrix <- as.matrix(expand.grid(delta, delta))
 
 ####### set up parameters for number of time series and number of time points ######
@@ -101,6 +101,7 @@ sink(file=paste0(root_dir, "/results/", cond_type, "_S", subject_id, ".txt"))
 cat("\n The first order difference:", is_difference, "\n")
 cat("\n Optimal model order:", P_opt, "\n")
 cat("\n Computation time: ", consumed_time, "\n")
+cat("\n The discount factor range:", range(delta), "\n")
 for(i in 1:length(result)){
   cat("\n Selected forward discount factor of area", cluster_area[i], ":", result[[i]]$best_delta_fwd, "\n")
   cat("\n Selected backward discount factor of area", cluster_area[i], ":", result[[i]]$best_delta_bwd, "\n")
