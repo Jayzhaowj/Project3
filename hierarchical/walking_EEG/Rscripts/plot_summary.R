@@ -1,9 +1,14 @@
 ####################################################
 ###### draw spectral density for walking EEG #######
 ####################################################
-draw_density_hier_wEEG <- function(w, times, P, n_t, s, ...){
+draw_density_hier_wEEG <- function(w, times, P, n_t, s, cond_type, ...){
   constant_hz <- 128
   y_coord <- w*128
+  if(cond_type == "walk_rotate"|cond_type == "stand_rotate"){
+    loc <- c(0, 0.5)
+  }else{
+    loc <- c(0, 1)
+  }
   jet.colors <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F",
                                    "yellow", "#FF7F00", "red", "#7F0000"))
   filled.contour(times[(P+1):(n_t-P)]/1000, y_coord, s[(P+1):(n_t-P), ], 
@@ -11,7 +16,7 @@ draw_density_hier_wEEG <- function(w, times, P, n_t, s, ...){
                  ylab = 'frequency (Hz)',
                  color.palette = jet.colors, 
                  plot.title = {title(xlab="time (s)", ylab = "frequency (Hz)", main = main)
-                               abline(v=c(0, 1), col = 'black', lty = 2)})
+                               abline(v=loc, col = 'black', lty = 2)}, ...)
   
   cat('Graph has been drawn!\n')
 }
@@ -57,33 +62,40 @@ w <- seq(0.001, 0.499, by = 0.001)
 
 ######### range of zlim ##########
 zlim <- c(-3, 10)
-
+ylim <- c(4, 50)
+xlim <- c(-.5, 1.5)
 cex <- 2
 for(index in 1:dim(data)[1]){
   main <- cluster_area[index]
   png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w, P = P, times = times,
-                         n_t = n_t, s = s_mean[[index]][1, , ],
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
+                         n_t = n_t, s = s_mean[[index]][1, , ], 
                          main = main,
-                         zlim = zlim)
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
   dev.off()
   
   png(filename = paste0(plot_dir, '/est_lb_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w, P = P, times = times,
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
                         n_t = n_t, s = s_mean_quantile[[index]][1, , ],
                         main = main,
-                        zlim = zlim)
+                        zlim = zlim, 
+                        ylim = ylim,
+                        xlim = xlim)
   dev.off()
   
   
   png(filename = paste0(plot_dir, '/est_ub_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w,  P = P, times=times,
+  draw_density_hier_wEEG(w = w,  P = P, times=times, cond_type = cond_type,
                         n_t = n_t, s = s_mean_quantile[[index]][2, , ],
                         main = main,
-                        zlim = zlim)
+                        zlim = zlim, 
+                        ylim = ylim,
+                        xlim = xlim)
   dev.off()
 }
 
@@ -117,27 +129,33 @@ for(index in 1:dim(data)[1]){
   main <- cluster_area[index]
   png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w, P = P, times = times,
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
                          n_t = n_t, s = s_mean[[index]][1, , ],
                          main = main,
-                         zlim = zlim)
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
   dev.off()
   
   png(filename = paste0(plot_dir, '/est_lb_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w, P = P, times = times,
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
                          n_t = n_t, s = s_mean_quantile[[index]][1, , ],
                          main = main,
-                         zlim = zlim)
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
   dev.off()
   
   
   png(filename = paste0(plot_dir, '/est_ub_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w,  P = P, times=times,
+  draw_density_hier_wEEG(w = w,  P = P, times=times, cond_type = cond_type,
                          n_t = n_t, s = s_mean_quantile[[index]][2, , ],
                          main = main,
-                         zlim = zlim)
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
   dev.off()
 }
 
@@ -171,27 +189,33 @@ for(index in 1:dim(data)[1]){
   main <- cluster_area[index]
   png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w, P = P, times = times,
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
                          n_t = n_t, s = s_mean[[index]][1, , ],
                          main = main,
-                         zlim = zlim)
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
   dev.off()
   
   png(filename = paste0(plot_dir, '/est_lb_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w, P = P, times = times,
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
                          n_t = n_t, s = s_mean_quantile[[index]][1, , ],
                          main = main,
-                         zlim = zlim)
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
   dev.off()
   
   
   png(filename = paste0(plot_dir, '/est_ub_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w,  P = P, times=times,
+  draw_density_hier_wEEG(w = w,  P = P, times=times, cond_type = cond_type,
                          n_t = n_t, s = s_mean_quantile[[index]][2, , ],
                          main = main,
-                         zlim = zlim)
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
   dev.off()
 }
 
@@ -228,27 +252,33 @@ for(index in 1:dim(data)[1]){
   main <- cluster_area[index]
   png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w, P = P, times = times,
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
                          n_t = n_t, s = s_mean[[index]][1, , ],
                          main = main,
-                         zlim = zlim)
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
   dev.off()
   
   png(filename = paste0(plot_dir, '/est_lb_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w, P = P, times = times,
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
                          n_t = n_t, s = s_mean_quantile[[index]][1, , ],
                          main = main,
-                         zlim = zlim)
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
   dev.off()
   
   
   png(filename = paste0(plot_dir, '/est_ub_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
-  draw_density_hier_wEEG(w = w,  P = P, times=times,
+  draw_density_hier_wEEG(w = w,  P = P, times=times, cond_type = cond_type,
                          n_t = n_t, s = s_mean_quantile[[index]][2, , ],
                          main = main,
-                         zlim = zlim)
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
   dev.off()
 }
 
