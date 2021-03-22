@@ -33,7 +33,7 @@ library(snowfall)
 root_dir <- getwd()
 
 ######## subject id #######
-subject_id <- 25
+subject_id <- 6
 load(file = paste0(root_dir, "/data/S", subject_id, ".RData"))
 
 
@@ -178,7 +178,10 @@ plot_dir <- paste0(root_dir, "/results/plots/subject_", subject_id, "/", cond_ty
 
 ########
 
-
+zlim <- c(-3, 10)
+ylim <- c(4, 50)
+xlim <- c(-.5, 1.5)
+cex <- 2
 for(index in 1:dim(data)[1]){
   main <- cluster_area[index]
   png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
@@ -206,6 +209,53 @@ for(index in 1:dim(data)[1]){
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w,  P = P, times=times, cond_type = cond_type,
                          n_t = n_t, s = s_mean_quantile[[index]][2, , ],
+                         main = main,
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
+  dev.off()
+}
+
+
+
+#### draw ERSPs
+######### range of zlim ##########
+zlim <- c(-0.5, .5)
+ylim <- c(4, 50)
+xlim <- c(-.5, 1.5)
+cex <- 2
+for(index in 1:dim(data)[1]){
+  main <- cluster_area[index]
+  s_mean_diff <- t(apply(s_mean[[index]][1, , ], 1, 
+                         function(x) x - s_mean[[index]][1, which(times==-500), ]))
+  png(filename = paste0(plot_dir, '/est_diff_mean_ch_', cluster_area[index], '.png'))
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
+                         n_t = n_t, s = s_mean_diff, 
+                         main = main,
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
+  dev.off()
+  
+  s_mean_quantile_diff <- t(apply(s_mean_quantile[[index]][1, , ], 1, 
+                                  function(x) x - s_mean_quantile[[index]][1, which(times==-500), ]))
+  png(filename = paste0(plot_dir, '/est_diff_lb_ch_', cluster_area[index], '.png'))
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
+                         n_t = n_t, s = s_mean_quantile_diff,
+                         main = main,
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
+  dev.off()
+  
+  s_mean_quantile_diff <- t(apply(s_mean_quantile[[index]][2, , ], 1, 
+                                  function(x) x - s_mean_quantile[[index]][2, which(times==-500), ]))
+  png(filename = paste0(plot_dir, '/est_diff_ub_ch_', cluster_area[index], '.png'))
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
+  draw_density_hier_wEEG(w = w,  P = P, times=times, cond_type = cond_type,
+                         n_t = n_t, s = s_mean_quantile_diff,
                          main = main,
                          zlim = zlim, 
                          ylim = ylim,
@@ -240,7 +290,10 @@ plot_dir <- paste0(root_dir, "/results/plots/subject_", subject_id, "/", cond_ty
 
 ########
 
-
+zlim <- c(-3, 10)
+ylim <- c(4, 50)
+xlim <- c(-.5, 1.5)
+cex <- 2
 for(index in 1:dim(data)[1]){
   main <- cluster_area[index]
   png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
@@ -275,6 +328,50 @@ for(index in 1:dim(data)[1]){
   dev.off()
 }
 
+#### draw ERSPs
+######### range of zlim ##########
+zlim <- c(-0.5, .5)
+ylim <- c(4, 50)
+xlim <- c(-.5, 1.5)
+cex <- 2
+for(index in 1:dim(data)[1]){
+  main <- cluster_area[index]
+  s_mean_diff <- t(apply(s_mean[[index]][1, , ], 1, 
+                         function(x) x - s_mean[[index]][1, which(times==-500), ]))
+  png(filename = paste0(plot_dir, '/est_diff_mean_ch_', cluster_area[index], '.png'))
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
+                         n_t = n_t, s = s_mean_diff, 
+                         main = main,
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
+  dev.off()
+  
+  s_mean_quantile_diff <- t(apply(s_mean_quantile[[index]][1, , ], 1, 
+                                  function(x) x - s_mean_quantile[[index]][1, which(times==-500), ]))
+  png(filename = paste0(plot_dir, '/est_diff_lb_ch_', cluster_area[index], '.png'))
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
+                         n_t = n_t, s = s_mean_quantile_diff,
+                         main = main,
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
+  dev.off()
+  
+  s_mean_quantile_diff <- t(apply(s_mean_quantile[[index]][2, , ], 1, 
+                                  function(x) x - s_mean_quantile[[index]][2, which(times==-500), ]))
+  png(filename = paste0(plot_dir, '/est_diff_ub_ch_', cluster_area[index], '.png'))
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
+  draw_density_hier_wEEG(w = w,  P = P, times=times, cond_type = cond_type,
+                         n_t = n_t, s = s_mean_quantile_diff,
+                         main = main,
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
+  dev.off()
+}
 
 
 
@@ -305,7 +402,10 @@ plot_dir <- paste0(root_dir, "/results/plots/subject_", subject_id, "/", cond_ty
 
 ########
 
-
+zlim <- c(-3, 10)
+ylim <- c(4, 50)
+xlim <- c(-.5, 1.5)
+cex <- 2
 for(index in 1:dim(data)[1]){
   main <- cluster_area[index]
   png(filename = paste0(plot_dir, '/est_mean_ch_', cluster_area[index], '.png'))
@@ -340,3 +440,47 @@ for(index in 1:dim(data)[1]){
   dev.off()
 }
 
+#### draw ERSPs
+######### range of zlim ##########
+zlim <- c(-0.5, .5)
+ylim <- c(4, 50)
+xlim <- c(-.5, 1.5)
+cex <- 2
+for(index in 1:dim(data)[1]){
+  main <- cluster_area[index]
+  s_mean_diff <- t(apply(s_mean[[index]][1, , ], 1, 
+                         function(x) x - s_mean[[index]][1, which(times==-500), ]))
+  png(filename = paste0(plot_dir, '/est_diff_mean_ch_', cluster_area[index], '.png'))
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
+                         n_t = n_t, s = s_mean_diff, 
+                         main = main,
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
+  dev.off()
+  
+  s_mean_quantile_diff <- t(apply(s_mean_quantile[[index]][1, , ], 1, 
+                                  function(x) x - s_mean_quantile[[index]][1, which(times==-500), ]))
+  png(filename = paste0(plot_dir, '/est_diff_lb_ch_', cluster_area[index], '.png'))
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
+  draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
+                         n_t = n_t, s = s_mean_quantile_diff,
+                         main = main,
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
+  dev.off()
+  
+  s_mean_quantile_diff <- t(apply(s_mean_quantile[[index]][2, , ], 1, 
+                                  function(x) x - s_mean_quantile[[index]][2, which(times==-500), ]))
+  png(filename = paste0(plot_dir, '/est_diff_ub_ch_', cluster_area[index], '.png'))
+  par(cex.lab = cex, cex.axis = cex, cex.main = cex)
+  draw_density_hier_wEEG(w = w,  P = P, times=times, cond_type = cond_type,
+                         n_t = n_t, s = s_mean_quantile_diff,
+                         main = main,
+                         zlim = zlim, 
+                         ylim = ylim,
+                         xlim = xlim)
+  dev.off()
+}
