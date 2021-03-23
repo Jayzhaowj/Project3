@@ -15,7 +15,7 @@ root_dir <- "/soe/wjzhao/project/Project3/eeg/"
 
 ### set up data directory
 #mydir <- "/Users/jay/Documents/Statistics/Papers/Research/log/11:30:17/data/"
-mydir <- "/soe/wjzhao/project/project1/EEG/data/"
+mydir <- "/soe/wjzhao/project/Project3/eeg/data/"
 #mydir <- "C:/Users/johnn/Desktop/EEG/data/"
 
 label <- c("F3", "C3", "P3", "Fz", "Cz", "Pz", "F4", "C4", "P4")
