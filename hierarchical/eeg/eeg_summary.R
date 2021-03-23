@@ -1,3 +1,14 @@
+root_dir <- "/Users/johnn/Documents/Research/Project3/hierarchical/eeg/"
+plot_dir <- paste0(root_dir, "plots/new")
+
+load(paste0(root_dir, "eeg_results.RData"))
+
+### load some parameters
+n_I <- 9
+w <- seq(0.001, 0.499, by = 0.001)
+label <- c("F3", "C3", "P3", "Fz", "Cz", "Pz", "F4", "C4", "P4")
+P <- 15
+n_t <- 3600
 
 draw_density_hier_eeg <- function(w, index, P, n_t, s, ...){
   constant1 <- 83.72/3600
@@ -49,7 +60,7 @@ for(index in 1:n_I){
                         main = bquote("log spectral density: "*.(label[index])),
                         zlim = zlim)
   dev.off()
-  cat("The channel of", label[index], "has been drawn.")
+  cat("\n The channel of", label[index], "has been drawn. \n")
 
 }
 
