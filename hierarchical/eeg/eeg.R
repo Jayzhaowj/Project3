@@ -7,7 +7,7 @@
 library(PARCOR)
 library(snowfall)
 
-root_dir <- "/soe/wjzhao/project/Project3/eeg/"
+root_dir <- "/soe/wjzhao/project/Project3/hierarchical/eeg/"
 
 
 ################# EEG #####################################
