@@ -1,40 +1,40 @@
 
  The first order difference: FALSE 
 
- Optimal model order: 2 2 2 3 2 2 3 2 
+ Optimal model order: 7 7 7 5 7 7 4 5 
 
- Computation time:  31.77 24.059 9517.983 0 0 
+ Computation time:  32.007 24.822 17732.32 0 0 
 
- The discount factor range: 0.9 0.95 
+ The discount factor range: 0.9 0.99 
 
- Selected forward discount factor of area left occipital : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected forward discount factor of area left occipital : 0.99 0.98 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.98 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.9 0.99 
 
- Selected backward discount factor of area left occipital : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected backward discount factor of area left occipital : 0.99 0.98 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.95 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 
 
- Selected forward discount factor of area right occipital : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected forward discount factor of area right occipital : 0.99 0.98 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.97 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.9 0.9 
 
- Selected backward discount factor of area right occipital : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected backward discount factor of area right occipital : 0.99 0.98 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.9 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 
 
- Selected forward discount factor of area left sensorimotor : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected forward discount factor of area left sensorimotor : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.9 0.99 
 
- Selected backward discount factor of area left sensorimotor : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected backward discount factor of area left sensorimotor : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 
 
- Selected forward discount factor of area anterior cingulate : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected forward discount factor of area anterior cingulate : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.97 0.92 
 
- Selected backward discount factor of area anterior cingulate : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected backward discount factor of area anterior cingulate : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 
 
- Selected forward discount factor of area right sensorimotor : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected forward discount factor of area right sensorimotor : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.9 0.97 
 
- Selected backward discount factor of area right sensorimotor : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected backward discount factor of area right sensorimotor : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 
 
- Selected forward discount factor of area posterior parietal : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected forward discount factor of area posterior parietal : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.9 0.99 
 
- Selected backward discount factor of area posterior parietal : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected backward discount factor of area posterior parietal : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 
 
- Selected forward discount factor of area supplementary motor : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected forward discount factor of area supplementary motor : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 
 
- Selected backward discount factor of area supplementary motor : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected backward discount factor of area supplementary motor : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 
 
- Selected forward discount factor of area anterior parietal : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected forward discount factor of area anterior parietal : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.9 0.94 
 
- Selected backward discount factor of area anterior parietal : 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 0.95 
+ Selected backward discount factor of area anterior parietal : 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 0.99 
