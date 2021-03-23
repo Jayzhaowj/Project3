@@ -1,0 +1,8 @@
+
+ Optimal model order: 11 
+
+ Computation time:  589.072 5.034 594.138 0 0 
+
+ The discount factor range: 0.99 0.999 
+
+ The range of frequency: 0.001 0.499 
