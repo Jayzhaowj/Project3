@@ -33,7 +33,7 @@ library(snowfall)
 root_dir <- getwd()
 
 ######## subject id #######
-subject_id <- 6
+subject_id <- 25
 load(file = paste0(root_dir, "/data/S", subject_id, ".RData"))
 
 
