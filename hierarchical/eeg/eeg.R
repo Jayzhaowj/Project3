@@ -7,7 +7,7 @@
 library(PARCOR)
 library(snowfall)
 
-
+root_dir <- "/soe/wjzhao/project/Project3/eeg/"
 
 
 ################# EEG #####################################
@@ -50,18 +50,19 @@ sample_size <- 1000
 n_t <- 3600
 n_I <- 9
 P <- 15
-
+S_0 <- 10
 delta <- seq(0.99, 0.999, by = 0.001)
 delta_matrix <- as.matrix(expand.grid(delta, delta))
-result_parcor <- hparcor(yt = data_all, P = P,
+ptm <- proc.time()
+result_parcor <- hparcor(yt = data_all, P = P, S_0 = S_0,
                          delta = delta_matrix, sample_size = sample_size,
                          chains = 1, DIC = TRUE, uncertainty = TRUE)
-
+consumed_time <- proc.time() - ptm
 ##########################################
 ##### optimal model order ############
 ##########################################
 P_opt <- which.min(result_parcor$DIC_fwd)
-cat("Optimal model order: ", P_opt)
+#cat("Optimal model order: ", P_opt)
 
 ##########################################
 ##### estimation of sigma2   ############
@@ -71,7 +72,7 @@ est_sigma2 <- rep(result_parcor$sigma2t_fwd[n_t-P, P_opt], n_t)
 ###################################
 #### discount factor
 ###################################
-print(result_parcor$best_delta_fwd)
+#print(result_parcor$best_delta_fwd)
 
 ## compute ar coefficients
 coef_parcor <- run_dl(phi_fwd = result_parcor$phi_fwd,
@@ -140,7 +141,14 @@ for(i in 1:n_I){
 s_mean_quantile <- apply(s_mean_sample[1, , , ], 1:2, quantile, c(0.025, 0.975))
 
 
+sink(file=paste0(root_dir, "eeg_log.txt"))
+cat("\n Optimal model order:", P_opt, "\n")
+cat("\n Computation time: ", consumed_time, "\n")
+cat("\n The discount factor range:", range(delta), "\n")
+cat("\n The range of frequency:", range(w), "\n")
+sink()
 
+save("s_mean", "s_mean_quantile", "s", "s_quantile", file = paste0(root_dir,  "eeg_results.RData"))
 
 
 ### draw ar coefficients
