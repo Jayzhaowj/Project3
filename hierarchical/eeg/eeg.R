@@ -46,7 +46,7 @@ data_all <- t(rbind(dlmd7_data, dlmd8_data, dlmd9_data,
                   dlmd11_data, dlmd12_data, dlmd13_data,
                   dlmd15_data, dlmd16_data, dlmd17_data))
 
-sample_size <- 1000
+sample_size <- 200
 n_t <- 3600
 n_I <- 9
 P <- 15
