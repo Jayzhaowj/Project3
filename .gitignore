@@ -46,4 +46,5 @@ vignettes/*.pdf
 
 # results of EEG
 /hierarchical/eeg/*.RData
+/hierarchical/Rcpp/simulation_4/scale/new/*.RData
 
