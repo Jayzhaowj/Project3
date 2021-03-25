@@ -3,7 +3,7 @@
 plot_dir <- "/soe/wjzhao/project/Project3/hierarchical/plots/Rcpp/"
 # source(paste0(dir1, 'hier_PARCOR_cpp.R'))
 # source(paste0(dir1, "draw_density_RcppVer.R"))
-
+#plot_dir <- "/Users/johnn/Documents/Research/Project3/hierarchical/plots/Rcpp/"
 
 library(matrixcalc)
 library(PARCOR)
@@ -108,11 +108,19 @@ ptm <- proc.time()
 result_parcor <- hparcor(yt = yt, delta = delta_matrix,
                          P = 5, sample_size = sample_size,
                          chains = 10, DIC = TRUE, uncertainty = TRUE)
+consumed_time <- proc.time() - ptm
 print(proc.time() - ptm)
 ###########################
 ##### Optimal model order
 ###########################
 P_opt <- which.min(result_parcor$DIC_fwd)
+
+## span of frequence
+w <- seq(0.001, 0.499, by = 0.001)
+
+
+
+
 cat("Optimal model order: ", P_opt)
 print(result_parcor$DIC_fwd)
 print(result_parcor$best_pred_dens_fwd)
@@ -126,6 +134,20 @@ print(result_parcor$best_delta_fwd)
 #### estimated innovation variance
 ###########################
 sigma2 <- rep(result_parcor$sigma2t_fwd[n_t-P, P_opt], n_t)
+
+
+#### save log 
+sink(file = paste0(plot_dir, "log.txt"))
+cat("\n Optimal model order:", P_opt, "\n")
+cat("\n Computation time: ", consumed_time, "\n")
+cat("\n The discount factor range:", range(delta), "\n")
+cat("\n The range of frequency:", range(w), "\n")
+cat("\n The selected discount factor:", result_parcor$best_delta_fwd, "\n")
+cat("\n The loglikelihood:", result_parcor$best_pred_dens_fwd, "\n")
+cat("\n The estimated sigma2:", result_parcor$sigma2t_fwd[n_t-P, P_opt])
+sink()
+
+
 
 ## compute ar coefficients
 coef_parcor <- run_dl(phi_fwd = result_parcor$phi_fwd,
@@ -156,8 +178,6 @@ coef_quantile <- apply(coef_sample, 1:3, quantile, c(0.025, 0.5, 0.975))
 
 
 ## compute spectral density
-## span of frequence
-w <- seq(0.001, 0.499, by = 0.001)
 
 ### spectral density of each time series
 s <- cp_sd_uni(w = w,
@@ -177,7 +197,7 @@ s_mean_true <- cp_sd_uni(phi=true_ar_mean, sigma2=rep(et,n_t), w=w)
 ####################################
 #### sample spectral density
 ####################################
-sfInit(parallel = TRUE, cpus=10, type="SOCK")
+sfInit(parallel = TRUE, cpus=6, type="SOCK")
 sfLibrary(PARCOR)
 sfExport("w", "coef_sample", "sigma2")
 s_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
@@ -187,7 +207,7 @@ sfStop()
 
 s_sample <- simplify2array(s_sample)
 
-sfInit(parallel = TRUE, cpus=10, type="SOCK")
+sfInit(parallel = TRUE, cpus=6, type="SOCK")
 sfLibrary(PARCOR)
 sfExport("w", "coef_mean_sample", "sigma2", "n_t", "P_opt")
 s_mean_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
@@ -204,7 +224,7 @@ s_mean_sample <- simplify2array(s_mean_sample)
 
 sim_index <- "simulation_4"
 index <- 1:(n_t-2*P)
-png(paste0(plot_dir, sim_index, "/scale/ar_coef.png"), width = 2500, height = 2000)
+png(paste0(plot_dir, sim_index, "/scale/new/ar_coef.png"), width = 2500, height = 2000)
 layout(matrix(1:10, 5, 2, byrow = TRUE))
 layout.show(n = 10)
 par(cex.lab = 2.5, cex.axis = 2.5, cex.main = 3)
@@ -241,7 +261,7 @@ for(i in 1:n_I){
 dev.off()
 
 
-png(paste0(plot_dir, sim_index, "/scale/BLF_scree.png"), width = 1500, height = 1400)
+png(paste0(plot_dir, sim_index, "/scale/new/BLF_scree.png"), width = 1500, height = 1400)
 layout(matrix(1, 1, 1))
 par(cex = 2)
 plot(result_parcor$best_pred_dens_fwd, type = 'l', xlab = 'P', ylab = 'log-likelihood')
@@ -283,28 +303,28 @@ for(i in 1:n_I){
   # zlim <- range(s[index, (P+1):(n_t-P),],
   #               s_quantile[, (P+1):(n_t-P),],
   #               s_true[index, (P+1):(n_t-P), ])
-  png(filename = paste0(plot_dir, sim_index, '/scale/est_', index, 'st.png'))
+  png(filename = paste0(plot_dir, sim_index, '/scale/new/est_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier(w = w, index = index, P = P,
                     n_t = n_t, s = s[index, , ], zlim = zlim)
   dev.off()
 
 
-  png(filename = paste0(plot_dir, sim_index, '/scale/true_', index, 'st.png'))
+  png(filename = paste0(plot_dir, sim_index, '/scale/new/true_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier(w = w, index = index, P = P,
                     n_t = n_t, s = s_true[index, , ], zlim = zlim)
   dev.off()
 
 
-  png(filename = paste0(plot_dir, sim_index, '/scale/ql_', index, 'st.png'))
+  png(filename = paste0(plot_dir, sim_index, '/scale/new/ql_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier(w = w, index = index, P = P,
                     n_t = n_t, s = s_quantile[[i]][1, , ], zlim = zlim)
   dev.off()
 
 
-  png(filename = paste0(plot_dir, sim_index, '/scale/qu_', index, 'st.png'))
+  png(filename = paste0(plot_dir, sim_index, '/scale/new/qu_', index, 'st.png'))
   par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
   draw_density_hier(w = w, index = index, P = P,
                n_t = n_t, s = s_quantile[[i]][2, , ], zlim = zlim)
@@ -317,14 +337,14 @@ for(i in 1:n_I){
 #### for baseline of all five time series
 index <- 1
 # zlim <- range(s_mean[1, ,], s_mean_true[1, , ])
-png(filename = paste0(plot_dir, sim_index, '/scale/est_', index, 'mean.png'))
+png(filename = paste0(plot_dir, sim_index, '/scale/new/est_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier(w = w, index = index, P = P,
                   n_t = n_t, s = s_mean[1, , ], zlim = zlim)
 dev.off()
 
 
-png(filename = paste0(plot_dir, sim_index, '/scale/true_', index, 'mean.png'))
+png(filename = paste0(plot_dir, sim_index, '/scale/new/true_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier(w = w, index = index, P = P,
                   n_t = n_t, s = s_mean_true[1, , ], zlim = zlim)
@@ -336,7 +356,7 @@ dev.off()
 #### for baseline of all five time series
 index <- 1
 # zlim <- range(s_mean[1, ,], s_mean_true[1, , ])
-png(filename = paste0(plot_dir, sim_index, '/scale/est_lb_', index, 'mean.png'))
+png(filename = paste0(plot_dir, sim_index, '/scale/new/est_lb_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier(w = w, index = index, P = P,
                   n_t = n_t, s = s_mean_quantile[1, , ], zlim = zlim)
@@ -345,7 +365,7 @@ dev.off()
 #### for baseline of all five time series
 index <- 1
 # zlim <- range(s_mean[1, ,], s_mean_true[1, , ])
-png(filename = paste0(plot_dir, sim_index, '/scale/est_ub_', index, 'mean.png'))
+png(filename = paste0(plot_dir, sim_index, '/scale/new/est_ub_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier(w = w, index = index, P = P,
                   n_t = n_t, s = s_mean_quantile[2, , ], zlim = zlim)

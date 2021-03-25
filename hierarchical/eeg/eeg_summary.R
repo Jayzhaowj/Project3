@@ -1,5 +1,5 @@
 root_dir <- "/Users/johnn/Documents/Research/Project3/hierarchical/eeg/"
-plot_dir <- paste0(root_dir, "plots/new")
+plot_dir <- paste0(root_dir, "plots/new/new/")
 
 load(paste0(root_dir, "eeg_results.RData"))
 
@@ -11,9 +11,9 @@ P <- 15
 n_t <- 3600
 
 draw_density_hier_eeg <- function(w, index, P, n_t, s, ...){
-  constant1 <- 83.72/3600
-  x_coord <- seq(constant1*P, 83.72 - constant1*P, length.out = n_t - 2 * P)
-  constant2 <- 3600/(256/5)
+  constant1 <- 84.375/3600
+  x_coord <- seq(constant1*P, 84.375 - constant1*P, length.out = n_t - 2 * P)
+  constant2 <- (256/6)
   y_coord <- constant2 * w
   jet.colors <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F",
                                    "yellow", "#FF7F00", "red", "#7F0000"))
@@ -90,4 +90,12 @@ par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier_eeg(w = w, index = index, P = P,
                       main = "log spectral density of mean",
                       n_t = n_t, s = s_mean_quantile[2, , ], zlim = zlim)
+dev.off()
+
+
+
+png(filename = paste0(plot_dir, "/ll_fwd.png"))
+par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
+plot(1:15, ll_fwd, pch = 4, xlab = "model order", ylab = "log (likelihood)", type = "l")
+points(1:15, ll_fwd, pch = 1)
 dev.off()
