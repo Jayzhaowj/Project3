@@ -197,7 +197,7 @@ s_mean_true <- cp_sd_uni(phi=true_ar_mean, sigma2=rep(et,n_t), w=w)
 ####################################
 #### sample spectral density
 ####################################
-sfInit(parallel = TRUE, cpus=6, type="SOCK")
+sfInit(parallel = TRUE, cpus=10, type="SOCK")
 sfLibrary(PARCOR)
 sfExport("w", "coef_sample", "sigma2")
 s_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
@@ -207,7 +207,7 @@ sfStop()
 
 s_sample <- simplify2array(s_sample)
 
-sfInit(parallel = TRUE, cpus=6, type="SOCK")
+sfInit(parallel = TRUE, cpus=10, type="SOCK")
 sfLibrary(PARCOR)
 sfExport("w", "coef_mean_sample", "sigma2", "n_t", "P_opt")
 s_mean_sample <- sfLapply(1:(sample_size), function(x) cp_sd_uni(w=w,
