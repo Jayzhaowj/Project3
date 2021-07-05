@@ -94,12 +94,8 @@ w <- seq(0.001, 0.499, by = 0.001)
 #########################
 ###### fit model #######
 #########################
-F2t <- matrix(1, nrow = n_I, ncol = n_I)
-F2t[1:4, 2:5] <- diag(4)
-F2t[5, ] <- -1*F2t[5, ]
-F2t[5,1] <- 1
 
-delta <- seq(0.99, 0.999, 0.002)
+delta <- seq(0.99, 0.999, 0.001)
 delta_matrix <- as.matrix(expand.grid(delta, delta))
 ll <- matrix(NA, nrow = n_I, ncol = n_sim)
 P_opt <- numeric(n_sim)
@@ -109,7 +105,7 @@ ptm <- proc.time()
 
 for(i in 1:n_sim){
   result_parcor <- hparcor(yt = yt[[i]], delta = delta_matrix,
-                           P = 5, F2 = F2t, sample_size = sample_size,
+                           P = 5, sample_size = sample_size,
                            chains = 10, DIC = TRUE, uncertainty = FALSE)
   ll[, i] <- result_parcor$best_pred_dens_fwd
   P_opt[i] <- which.min(result_parcor$DIC_fwd)
