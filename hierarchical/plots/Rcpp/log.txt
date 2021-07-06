@@ -1,7 +1,7 @@
 
  Optimal model order: 2 
 
- Computation time:  989.604 228.204 156.528 0 0 
+ Computation time:  996.395 240.695 160.356 0 0 
 
  The discount factor range: 0.99 0.999 
 
@@ -9,6 +9,6 @@
 
  The selected discount factor: 0.996 0.999 0.999 0.999 0.999 0.999 0.99 0.99 0.999 0.999 
 
- The loglikelihood: -8703.961 -6021.407 -6014.351 -6005.803 -6003.586 
+ The loglikelihood: -8705.017 -6020.971 -6013.61 -6004.855 -6000.679 
 
- The estimated sigma2: 0.6238557
+ The estimated sigma2: 0.6235684
