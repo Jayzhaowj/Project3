@@ -1,0 +1,14 @@
+
+ Optimal model order: 2 
+
+ Computation time:  1102.118 244.72 168.833 0 0 
+
+ The discount factor range: 0.99 0.999 
+
+ The range of frequency: 0.001 0.499 
+
+ The selected discount factor: 0.997 0.997 0.999 0.999 0.997 0.999 0.999 0.999 0.999 0.99 
+
+ The loglikelihood: -8680.12 -6075.208 -6064.313 -6060.059 -6052.839 
+
+ The estimated sigma2: 0.638572
