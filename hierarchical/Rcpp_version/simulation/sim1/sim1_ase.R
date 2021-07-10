@@ -70,7 +70,7 @@ n_I <- 5
 P <- 2
 vt <- 0.5
 et <- 0.8
-n_sim <- 50
+n_sim <- 51
 sim <- rep(list(NA), n_sim)
 yt <- rep(list(NA), n_sim)
 true_ar <- rep(list(NA), n_sim)
@@ -85,7 +85,7 @@ for(i in 1:n_sim){
 #######
 ##
 ######
-mse <- matrix(NA, nrow = n_I, ncol = n_sim)
+mse_parcor <- matrix(NA, nrow = n_I, ncol = n_sim)
 ## compute spectral density
 ## span of frequence
 w <- seq(0.001, 0.499, by = 0.001)
@@ -128,12 +128,55 @@ for(i in 1:n_sim){
                  sigma2 = sigma2)
   ### True spectral density
   s_true <- cp_sd_uni(phi=true_ar[[i]], sigma2 = rep(et, n_t), w=w)
-  mse[, i] <- apply((s-s_true)^2, 1, mean)
+  mse_parcor[, i] <- apply((s-s_true)^2, 1, mean)
   cat("\n iterations of simulation: ", i, "/", n_sim, "\n")
 }
 
 print(proc.time() - ptm)
 
+####
+ptm <- proc.time()
+P_max <- P
+mse_tvar <- matrix(NA, nrow = n_I, ncol = n_sim)
+FF <- matrix(NA, nrow = n_t-P_max, ncol= P_max)
+coef_tvar <- array(NA, dim = c(1, n_t-P_max, P_max))
+s_tvar <- array(NA, dim = c(n_I, n_t, length(w)))
+P_max <- 2
+for(i in 1:n_sim){
+  for(j in 1:n_I){
+    for(k in 1:P_max){
+      FF[, k] <- yt[[i]][(P_max+1):n_t-k, j]
+    }
+    result_tvar <- tvar(yt = yt[[i]][(P_max+1):n_t, j], 
+                        FF = FF, n0 = 1.0, S0 = 1.0, delta = delta)
+    #ll[, i] <- result_tvar$ll_max
+    
+    sigma2 <- result_tvar$St
+    coef_tvar <- array(result_tvar$mt, dim = c(1, P_max, n_t-P_max))
+    coef_tvar <- aperm(coef_tvar, perm = c(1, 3, 2))
+    ### spectral density of each time series
+    s_tvar[j, (P_max+1):n_t, ] <- cp_sd_uni(w = w,
+                                  phi = coef_tvar,
+                                  sigma2 = sigma2)
+  }
+    ### True spectral density
+    s_true <- cp_sd_uni(phi=true_ar[[i]], sigma2 = rep(et, n_t), w=w)
+    mse_tvar[, i] <- apply((s_tvar[, (P_max+1):n_t, ]-s_true[, (P_max+1):n_t, ])^2, 1, mean)
+    cat("\n iterations of simulation: ", i, "/", n_sim, "\n")
+}
+  
+
+print(proc.time() - ptm)
+
+
+dir <- "/Users/johnn/Documents/Research/Project3/hierarchical/plots/Rcpp/simulation_4/"
+#### save log 
+sink(file = paste0(dir, "log_simluation50.txt"))
+cat("\n hPARCOR mse mean:", apply(mse_parcor, 1, mean), "\n")
+cat("\n hPARCOR mse sd: ", apply(mse_parcor, 1, sd), "\n")
+cat("\n tvar mse mean:", apply(mse_tvar, 1, mean), "\n")
+cat("\n tvar mse sd:", apply(mse_tvar, 1, sd), "\n")
+sink()
 
 ##### draw log-likelihood
 png(paste0(plot_dir, 'll_sim1.png'))
