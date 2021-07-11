@@ -1,7 +1,7 @@
 
  Optimal model order: 11 
 
- Computation time:  589.072 5.034 594.138 0 0 
+ Computation time:  646.274 19.314 665.633 0 0 
 
  The discount factor range: 0.99 0.999 
 
