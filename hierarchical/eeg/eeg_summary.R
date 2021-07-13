@@ -1,5 +1,5 @@
 root_dir <- "/Users/johnn/Documents/Research/Project3/hierarchical/eeg/"
-plot_dir <- paste0(root_dir, "plots/new/new/")
+plot_dir <- paste0(root_dir, "plots/for_paper")
 
 load(paste0(root_dir, "eeg_results.RData"))
 
@@ -70,7 +70,7 @@ index <- 1
 png(filename = paste0(plot_dir, '/est_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier_eeg(w = w, index = index, P = P,
-                      main = "log spectral density of mean",
+                      main = "Estimated baseline of log SD",
                       n_t = n_t, s = s_mean[1, , ], zlim = zlim)
 dev.off()
 
@@ -79,7 +79,7 @@ index <- 1
 png(filename = paste0(plot_dir, '/est_lb_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier_eeg(w = w, index = index, P = P,
-                      main = "log spectral density of mean",
+                      main = "Estimated baseline of log SD",
                       n_t = n_t, s = s_mean_quantile[1, , ], zlim = zlim)
 dev.off()
 
@@ -88,7 +88,7 @@ index <- 1
 png(filename = paste0(plot_dir, '/est_ub_', index, 'mean.png'))
 par(cex.lab = 1.5, cex.axis = 1.5, cex.main = 1.5)
 draw_density_hier_eeg(w = w, index = index, P = P,
-                      main = "log spectral density of mean",
+                      main = "Estimated baseline of log SD",
                       n_t = n_t, s = s_mean_quantile[2, , ], zlim = zlim)
 dev.off()
 
