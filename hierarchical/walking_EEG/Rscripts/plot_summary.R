@@ -460,8 +460,7 @@ for(index in 1:dim(data)[1]){
                          xlim = xlim)
   dev.off()
   
-  s_mean_quantile_diff <- t(apply(s_mean_quantile[[index]][1, , ], 1, 
-                                  function(x) x - s_mean_quantile[[index]][1, which(times==-500), ]))
+  s_mean_quantile_diff <- s_mean_diff_quantile[[index]][1, , ]
   png(filename = paste0(plot_dir, '/est_diff_lb_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w, P = P, times = times, cond_type = cond_type,
@@ -472,8 +471,8 @@ for(index in 1:dim(data)[1]){
                          xlim = xlim)
   dev.off()
   
-  s_mean_quantile_diff <- t(apply(s_mean_quantile[[index]][2, , ], 1, 
-                                  function(x) x - s_mean_quantile[[index]][2, which(times==-500), ]))
+  s_mean_quantile_diff <- s_mean_diff_quantile[[index]][2, , ]
+                                  
   png(filename = paste0(plot_dir, '/est_diff_ub_ch_', cluster_area[index], '.png'))
   par(cex.lab = cex, cex.axis = cex, cex.main = cex)
   draw_density_hier_wEEG(w = w,  P = P, times=times, cond_type = cond_type,
