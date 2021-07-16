@@ -49,3 +49,4 @@ vignettes/*.pdf
 /hierarchical/plots/Rcpp/simulation_4/scale/backup/*.RData
 /hierarchical/plots/Rcpp/simulation_4/*.RData
 /hierarchical/plots/Rcpp/simulation_5/*.RData
+/hierarchical/Rcpp_version/simulation/sim1/simulation_results.RData
