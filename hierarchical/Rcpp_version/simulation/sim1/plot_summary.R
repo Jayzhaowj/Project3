@@ -2,11 +2,7 @@ dev.off()
 graphics.off()
 index <- 1
 png(paste0(plot_dir, "sim1_sc", index, ".png"), width = 2000, height=900)
-draw_density_ci <- function(x_coord, y_coord, s, s_quantile, index){
-  cex.axis <- 3
-  cex.lab <- 4
-  cex.main <- 4.5
-  line <- 4.5
+draw_density_ci <- function(x_coord, y_coord, s, s_quantile, index, main){
   mar.orig <- (par.orig <- par(c("mar", "las", "mfrow")))$mar
   on.exit(par(par.orig))
   ww <- (3 + mar.orig[2L]) * par("csi") * 2.54
@@ -48,10 +44,13 @@ draw_density_ci <- function(x_coord, y_coord, s, s_quantile, index){
   mar[2L] <- 9.1
   par(mar = mar)
   ## upper bound
+  if(missing(main)){
+    main <- bquote("log SD: "*hat(s)[.(index)])
+  }
   plot.new()
   plot.window(xlim, ylim, "", xaxs="i", yaxs="i", asp = NA)
   .filled.contour(x_coord, y_coord, s_quantile[[index]][2, (P+1):(n_t-P), ], as.double(levels), col = jet.colors(length(levels)-1))
-  title(main = bquote("log SD: "*hat(s)[.(index)]), xlab = "time", ylab = "frequency", line = line,
+  title(main = main, xlab = "time", ylab = "frequency", line = line,
         cex.lab = cex.lab, cex.main = cex.main)
   Axis(x_coord, side = 1, cex.axis=cex.axis, font.axis=2)
   Axis(y_coord, side = 2, cex.axis=cex.axis, font.axis=2)
@@ -66,7 +65,7 @@ draw_density_ci <- function(x_coord, y_coord, s, s_quantile, index){
   plot.new()
   plot.window(xlim, ylim, "", xaxs="i", yaxs="i", asp = NA)
   .filled.contour(x_coord, y_coord, s[index, (P+1):(n_t-P), ], as.double(levels), col = jet.colors(length(levels)-1))
-  title(main = bquote("log SD: "*hat(s)[.(index)]), xlab = "time", ylab = "frequency", line = line,
+  title(main = main, xlab = "time", ylab = "frequency", line = line,
         cex.lab = cex.lab, cex.main = cex.main)
   Axis(x_coord, side = 1, cex.axis=cex.axis, font.axis=2)
   Axis(y_coord, side = 2, cex.axis=cex.axis, font.axis=2)
@@ -81,7 +80,7 @@ draw_density_ci <- function(x_coord, y_coord, s, s_quantile, index){
   plot.new()
   plot.window(xlim, ylim, "", xaxs="i", yaxs="i", asp = NA)
   .filled.contour(x_coord, y_coord, s_quantile[[index]][1, (P+1):(n_t-P), ], as.double(levels), col = jet.colors(length(levels)-1))
-  title(main = bquote("log SD: "*hat(s)[.(index)]), xlab = "time", ylab = "frequency", line = line,
+  title(main = main, xlab = "time", ylab = "frequency", line = line,
         cex.lab = cex.lab, cex.main = cex.main)
   Axis(x_coord, side = 1, cex.axis=cex.axis, font.axis=2)
   Axis(y_coord, side = 2, cex.axis=cex.axis, font.axis=2)
@@ -95,10 +94,6 @@ dev.off()
 graphics.off()
 
 draw_density_te <- function(x_coord, y_coord, s, s_true, index, main1, main2){
-  cex.axis <- 3
-  cex.lab <- 4
-  cex.main <- 4.5
-  line <- 4.5
   mar.orig <- (par.orig <- par(c("mar", "las", "mfrow")))$mar
   on.exit(par(par.orig))
   ww <- (3 + mar.orig[2L]) * par("csi") * 2.54
@@ -208,25 +203,37 @@ jet.colors <- colorRampPalette(c("#00007F", "blue", "#007FFF", "cyan", "#7FFF7F"
 
 
 
-zlim <- range(s, s_mean, s_mean_quantile, s_true, s_mean_true)
+zlim <- range(s, s_mean, s_mean_quantile, s_true, s_mean_true, s_quantile)
 
 draw_density_ci(x_coord = x_coord, y_coord = y_coord, s = s, s_quantile = s_quantile, 
                 index = 1)
 
-draw_density_te(x_coord = x_coord, y_coord = y_coord, s = s, s_true = s_true, 
-                main1 = bquote("log SD: "*hat(s)[.(index)]),
-                main2 = bquote("log SD: "*s[.(index)]),
-                index = 1)
-
-draw_density_te(x_coord = x_coord, y_coord = y_coord, s = s, s_true = s_true, 
-                main1 = bquote("log SD: "*hat(s)[.(index)]),
-                main2 = bquote("log SD: "*s[.(index)]),
+draw_density_ci(x_coord = x_coord, y_coord = y_coord, s = s, s_quantile = s_quantile, 
                 index = 4)
 
+draw_density_ci(x_coord = x_coord, y_coord = y_coord, s = s, s_quantile = s_quantile, 
+                index = 5)
+
+draw_density_ci(x_coord = x_coord, y_coord = y_coord, s = s_mean, s_quantile = list(s_mean_quantile), 
+                index = 1, main = bquote("log SD: "*hat(bar(s))))
+
+index <- 1
 draw_density_te(x_coord = x_coord, y_coord = y_coord, s = s, s_true = s_true, 
                 main1 = bquote("log SD: "*hat(s)[.(index)]),
                 main2 = bquote("log SD: "*s[.(index)]),
-                index = 5)
+                index = index)
+
+index <- 4
+draw_density_te(x_coord = x_coord, y_coord = y_coord, s = s, s_true = s_true, 
+                main1 = bquote("log SD: "*hat(s)[.(index)]),
+                main2 = bquote("log SD: "*s[.(index)]),
+                index = index)
+
+index <- 5 
+draw_density_te(x_coord = x_coord, y_coord = y_coord, s = s, s_true = s_true, 
+                main1 = bquote("log SD: "*hat(s)[.(index)]),
+                main2 = bquote("log SD: "*s[.(index)]),
+                index = index)
 
 
 draw_density_te(x_coord = x_coord, y_coord = y_coord, s = s_mean, s_true = s_mean_true, 
