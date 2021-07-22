@@ -232,15 +232,15 @@ s_mean_sample <- simplify2array(s_mean_sample)
 # # dev.off()
 # 
 # 
-# ######################################################
-# ### compute 95% credible interval of spectral density
-# ######################################################
-# s_quantile <- rep(list(NA), n_I)
-# for(i in 1:n_I){
-#   s_quantile[[i]] <- apply(s_sample[i, , , ], 1:2, quantile, c(0.025, 0.975))
-# }
-# 
-# s_mean_quantile <- apply(s_mean_sample[1, , , ], 1:2, quantile, c(0.025, 0.975))
+######################################################
+### compute 95% credible interval of spectral density
+######################################################
+s_quantile <- rep(list(NA), n_I)
+for(i in 1:n_I){
+  s_quantile[[i]] <- apply(s_sample[i, , , ], 1:2, quantile, c(0.025, 0.975))
+}
+
+s_mean_quantile <- apply(s_mean_sample[1, , , ], 1:2, quantile, c(0.025, 0.975))
 # 
 # #####################################
 # ## draw spectral density plots
